@@ -750,7 +750,7 @@ function renderCommunityBand() {
 /* ---------- Render: store band ----------
    Only shows if STORE_URL is set in config.js. */
 function renderVendorBand() {
-  if (!STORE_URL) return "";
+  if (!STORE_URL || typeof STORE_BUTTONS_ON_CONTENT === "undefined" || !STORE_BUTTONS_ON_CONTENT) return "";
   return `
   <section class="vendor-band">
     <div class="wrap">
@@ -765,7 +765,7 @@ function renderVendorBand() {
 
 /* Small "buy" strip at the top of the library and each peptide page. Hidden when STORE_URL is blank. */
 function renderBuyBar() {
-  if (!STORE_URL) return "";
+  if (!STORE_URL || typeof STORE_BUTTONS_ON_CONTENT === "undefined" || !STORE_BUTTONS_ON_CONTENT) return "";
   return `
   <div class="buy-bar">
     <a class="btn btn-primary" href="${STORE_URL}" target="_blank" rel="noopener">${STORE_BUTTON}</a>
@@ -788,7 +788,7 @@ function renderWaterCard() {
 
 /* Calculator page: dark "where to buy" section at the bottom. Hidden when STORE_URL is blank. */
 function renderOrderSection() {
-  if (!STORE_URL) return "";
+  if (!STORE_URL || typeof STORE_BUTTONS_ON_CONTENT === "undefined" || !STORE_BUTTONS_ON_CONTENT) return "";
   return `
   <section class="calc-section section-dark" id="order-sec">
     <a id="order" class="anchor"></a>

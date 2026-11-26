@@ -18,7 +18,10 @@ const BRAND_TEXT   = "#2A2026";   // main text color
    Education sites work best as a calm, separate space. Leave STORE_URL blank
    to keep this site purely educational with no buy buttons anywhere.
    If you do want a link, fill in all of these. */
-const STORE_URL        = "";                          // e.g. "https://yourstore.com"
+const STORE_URL        = "https://sanoresearch.org";
+// Where the store link shows. false = only the top menu "Shop" link and the footer button.
+// true would also add store buttons on every peptide page, the library, and the calculator.
+const STORE_BUTTONS_ON_CONTENT = false;
 const STORE_NAV_LABEL  = "Shop";                      // top menu link
 const STORE_BUTTON     = "Visit the store";           // button text
 const STORE_BAND_TITLE = "Shop";                      // heading on the store band
