@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Peptide</title>
+<script src="config.js"></script>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="nav"></div>
+<main id="page"></main>
+<div id="vendorBand"></div>
+<div id="footer"></div>
+<script src="data.js"></script>
+<script>
+  document.getElementById('nav').innerHTML = renderNav('library'); initMobileNav();
+  document.getElementById('footer').innerHTML = renderFooter();
+  document.getElementById('vendorBand').innerHTML = renderVendorBand();
+
+  const slug = new URLSearchParams(location.search).get('p');
+  const p = PEPTIDES.find(x => x.slug === slug);
+  const page = document.getElementById('page');
+
+  if (!p) {
+    page.innerHTML = `<section class="section"><div class="wrap"><h1 class="display">Not found</h1>
+      <p style="color:var(--ink-soft);margin:12px 0 20px">That peptide is not in the library yet.</p>
+      <a class="btn btn-primary" href="library.html">Back to the library</a></div></section>`;
+  } else {
+    const cat = CATEGORIES[p.cat];
+    const specRows = Object.entries(p.specs).map(([k,v]) =>
+      `<div class="spec-row"><span class="k">${k}</span><span class="v">${v}</span></div>`).join("");
+
+    const reconBlock = p.recon ? `
+      <div class="side-card">
+        <h3>${p.recon.diluent ? 'Liquid to mix' : 'BAC water to mix'}</h3>
+        <div class="spec-row"><span class="k">Vial amount</span><span class="v">${p.recon.mg} ${p.recon.unit || 'mg'}</span></div>
+        <div class="spec-row"><span class="k">${p.recon.diluent || 'BAC water'} to add</span><span class="v">${p.recon.ml} ml</span></div>
+        <p class="source-note">A common starting point from supplier reference sheets. The calculator adjusts to your exact vial.</p>
+      </div>` : "";
+
+    const doseBlock = (p.presets && p.presets.length) ? `
+      <div class="side-card">
+        <h3>Suggested amounts</h3>
+        ${p.presets.map(ps => `<div class="spec-row"><span class="k">${ps.label}</span><span class="v">${ps.dose} ${ps.unit}</span></div>`).join("")}
+        <p class="source-note">What supplier reference sheets commonly list. Not a recommendation.</p>
+      </div>` : "";
+
+    const nasalBlock = p.nasal ? `
+      <div class="side-card">
+        <h3>${p.name} intranasal option</h3>
+        ${p.nasal.rows.map(r => `<div class="spec-row"><span class="k">${r[0]}</span><span class="v">${r[1]}</span></div>`).join("")}
+        ${p.nasal.note ? `<p class="source-note">${p.nasal.note}</p>` : ""}
+      </div>` : "";
+
+    const sched = p.schedule || (typeof SCHEDULES !== 'undefined' ? SCHEDULES[p.slug] : null);
+    const scheduleBlock = sched ? `
+      <div class="side-card">
+        <h3>Suggested schedule</h3>
+        <div class="spec-row"><span class="k">Timing</span><span class="v">${sched.timing}</span></div>
+        <div class="spec-row"><span class="k">Frequency</span><span class="v">${sched.frequency}</span></div>
+        <div class="spec-row"><span class="k">Duration</span><span class="v">${sched.duration}</span></div>
+        <p class="source-note">What supplier reference sheets commonly show. Not a recommendation.</p>
+      </div>` : "";
+
+    page.innerHTML = `
+    <section class="section" style="padding-bottom:56px">
+      <div class="wrap">
+        <a href="library.html#${p.cat}" style="font-size:0.88rem">← ${cat.name}</a>
+        <div class="detail-head" style="margin-top:14px">
+          <span class="detail-cat" style="color:var(--teal-deep)">${cat.name}</span>
+          <h1 class="display">${p.name}</h1>
+          <p class="detail-lede" style="margin-top:12px">${p.lede}</p>
+          ${renderBuyBar()}
+        </div>
+
+        <div class="detail-grid">
+          <div class="detail-main">
+            <h2>What it is</h2>
+            ${p.body.map(t => `<p>${t}</p>`).join("")}
+
+            <h2>Benefits people look to it for</h2>
+            <ul class="benefit-list">${p.benefits.map(b => `<li>${b}</li>`).join("")}</ul>
+
+            <h2>What to know</h2>
+            <p>${p.side}</p>
+
+            ${p.tipNote ? `<div class="callout callout-teal">${p.tipNote}</div>` : ``}
+
+            ${p.cycleNote ? `<div class="callout"><b>Cycling and what to expect.</b> ${p.cycleNote}</div>` : ``}
+
+            <div class="callout"><b>About the numbers.</b> Any amounts here reflect what supplier reference sheets commonly show, shared for understanding only. They are not a protocol or a recommendation.</div>
+
+            ${p.sources && p.sources.length ? `<h2>Research referenced</h2>
+            <ul class="source-list">${p.sources.map(s => `<li><a href="${s.url}" target="_blank" rel="noopener nofollow">${s.label}</a></li>`).join("")}</ul>` : ``}
+          </div>
+
+          <aside class="detail-side">
+            ${doseBlock}
+            ${scheduleBlock}
+            ${nasalBlock}
+            ${reconBlock}
+            <div class="side-card">
+              <h3>Quick reference</h3>
+              ${specRows}
+            </div>
+            ${COMMUNITY_URL ? `<div class="side-card"><h3>${COMMUNITY_NAME}</h3><p style="font-size:0.9rem;color:var(--ink-soft);margin:0 0 12px">${COMMUNITY_BLURB}</p><a class="btn btn-ghost" style="width:100%" href="${COMMUNITY_URL}" target="_blank" rel="noopener">${COMMUNITY_BUTTON}</a></div>` : ``}
+            ${p.presets ? `<a class="btn btn-primary" style="width:100%" href="calculator.html?p=${p.slug}">Calculate my dose</a>` : ``}
+          </aside>
+        </div>
+      </div>
+    </section>`;
+    document.title = `${p.name} | ${SITE_NAME}`;
+  }
+</script>
+</body>
+</html>

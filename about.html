@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About </title>
+<meta name="description" content="Why this guide exists, and an honest explanation of why peptides are labeled research use only.">
+<script src="config.js"></script>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="nav"></div>
+
+<section class="page-intro">
+  <div class="wrap">
+    <span class="eyebrow">About</span>
+    <h1 class="display">Why this guide exists</h1>
+    <p>Peptides are confusing to learn about. Most of what you find online is either a dense forum thread or a sales page. This site is the calm middle: a plain, organized library that explains what each peptide is, what people look to it for, and how the math works.</p>
+  </div>
+</section>
+
+<section class="section" style="padding-top:24px">
+  <div class="wrap" style="max-width:720px">
+    <h2 class="display" style="font-size:1.3rem;margin-bottom:14px">What you will find here</h2>
+    <p style="color:var(--ink-soft);margin-bottom:14px">A <a href="library.html">library</a> of popular peptides, sorted by what they help with. Each page keeps to the basics: what it is, the benefits people look to it for, what to know, and the amounts supplier reference sheets commonly show.</p>
+    <p style="color:var(--ink-soft);margin-bottom:14px">A <a href="calculator.html">calculator</a> that handles reconstitution and dosing math, with syringe basics and a step-by-step mixing guide.</p>
+    <p id="aboutCommunity" style="color:var(--ink-soft);margin-bottom:14px"></p>
+    <p style="color:var(--ink-soft)">Nothing here is a prescription or a protocol. It is education, organized so you can make a confident, informed choice for yourself.</p>
+  </div>
+</section>
+
+<div id="communityBand"></div>
+
+<!-- Research-use-only: dark band so it reads as the serious explainer -->
+<section class="section dark-band" style="padding:64px 0">
+  <div class="wrap" style="max-width:720px">
+
+    <div style="text-align:center;margin-bottom:8px">
+      <span class="eyebrow">The question everyone asks</span>
+    </div>
+    <h2 class="display" style="font-size:1.5rem;text-align:center;margin:10px 0 18px">Why does the label say<br>"research use only"?</h2>
+    <p style="color:var(--ink-soft);text-align:center;max-width:54ch;margin:0 auto 40px">Almost every peptide vial says "not for human consumption," even the ones people clearly buy for themselves. It looks alarming. Here is the honest version, in three points.</p>
+
+    <div class="reason-row">
+      <div class="reason-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+      <div>
+        <h3>It is about approval, not danger</h3>
+        <p>Most peptides have not gone through the full FDA approval process, which requires large, expensive human trials. Without that, a company cannot legally sell them as products meant to be consumed. So they use a research label. The wording is about regulatory status, not a verdict that the compound is fake or harmful.</p>
+      </div>
+    </div>
+
+    <div class="reason-row">
+      <div class="reason-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6"/><path d="M12 8a5 5 0 0 0-5 5c0 4 5 9 5 9s5-5 5-9a5 5 0 0 0-5-5z"/></svg></div>
+      <div>
+        <h3>The rules are shifting</h3>
+        <p>Recent regulatory movement has let licensed compounding pharmacies prepare a small number of peptides under a doctor's supervision. That is progress, but it still is not the same as full FDA approval with completed clinical trials.</p>
+      </div>
+    </div>
+
+    <div class="reason-row">
+      <div class="reason-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+      <div>
+        <h3>Where you buy matters</h3>
+        <p>Because the research-only market is not tightly regulated, quality and purity vary widely between sellers. Look for a company that publishes a Certificate of Analysis for every batch, so you can check purity and identity before you buy. The <a href="calculator.html#recon">reconstitution page</a> explains how to read one.</p>
+      </div>
+    </div>
+
+    <p style="color:var(--ink-soft);text-align:center;max-width:52ch;margin:36px auto 0;font-size:1.05rem">The label is a reason to be informed, not a reason to panic. Read, ask questions, and make a confident, educated choice for yourself.</p>
+
+    <div class="disclaimer-strip" style="margin-top:36px">
+      <b>Educational only.</b> Nothing here is medical, legal, or financial advice, and nothing encourages or instructs the use of any compound. Please consult qualified professionals for your situation.
+    </div>
+
+    <div style="text-align:center;margin-top:36px">
+      <a class="btn btn-primary btn-lg" href="library.html">Explore peptides</a>
+    </div>
+  </div>
+</section>
+
+<div id="vendorBand"></div>
+<div id="footer"></div>
+<script src="data.js"></script>
+<script>
+  document.getElementById('nav').innerHTML = renderNav('about'); initMobileNav();
+  document.getElementById('footer').innerHTML = renderFooter();
+  document.getElementById('vendorBand').innerHTML = renderVendorBand();
+  document.getElementById('communityBand').innerHTML = renderCommunityBand();
+  if (COMMUNITY_URL) document.getElementById('aboutCommunity').innerHTML = `A <a href="${COMMUNITY_URL}" target="_blank" rel="noopener">${COMMUNITY_NAME}</a> for anyone who wants to go deeper than a public page allows.`; else document.getElementById('aboutCommunity').remove();
+</script>
+</body>
+</html>

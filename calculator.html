@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculator &amp; Reconstitution </title>
+<meta name="description" content="A simple peptide dosage and reconstitution calculator with suggested amounts, syringe basics, supplies, and where to buy.">
+<script src="config.js"></script>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="nav"></div>
+
+<section class="page-intro">
+  <div class="wrap">
+    <span class="eyebrow">The Calculator</span>
+    <h1 class="display">Dosage &amp; reconstitution</h1>
+    <p>Everything you need to mix, measure, and draw. Use the tabs to jump to what you need.</p>
+  </div>
+</section>
+
+<!-- Sticky quick-jump tabs -->
+<nav class="calc-tabs" id="calcTabs">
+  <div class="wrap calc-tabs-inner">
+    <a href="#calc" class="calc-tab active">Calculator</a>
+    <a href="#syringe" class="calc-tab">Your syringe</a>
+    <a href="#recon" class="calc-tab">Reconstitution</a>
+    <a href="#supplies" class="calc-tab">Supplies</a>
+    <a href="#order" class="calc-tab">Where to buy</a>
+  </div>
+</nav>
+
+<!-- ===== CALCULATOR ===== -->
+<section class="calc-section section-light" id="calc">
+  <div class="wrap">
+    <div class="calc-shell">
+      <div class="calc-steps">
+
+        <div class="calc-step">
+          <div class="calc-step-head"><span class="calc-num">1</span><h3>Pick your peptide</h3></div>
+          <p class="hint">Optional. Choosing one fills in common amounts you can adjust.</p>
+          <div class="calc-field pep-picker">
+            <select id="pepSelect"><option value="">Choose a peptide (optional)</option></select>
+          </div>
+        </div>
+
+        <div class="calc-step">
+          <div class="calc-step-head"><span class="calc-num">2</span><h3>What is in the vial?</h3></div>
+          <p class="hint">Look at your vial label. How many milligrams of peptide does it contain?</p>
+          <div class="calc-field">
+            <label for="mg">Peptide amount in the vial</label>
+            <div class="calc-input-row">
+              <input type="number" id="mg" inputmode="decimal" placeholder="e.g. 10" min="0" step="any">
+              <select disabled><option>mg</option></select>
+            </div>
+          </div>
+        </div>
+
+        <div class="calc-step">
+          <div class="calc-step-head"><span class="calc-num">3</span><h3>How much BAC water did you add?</h3></div>
+          <p class="hint">The bacteriostatic (BAC) water you mixed in to reconstitute it.</p>
+          <div class="calc-field">
+            <label for="ml">BAC water added</label>
+            <div class="calc-input-row">
+              <input type="number" id="ml" inputmode="decimal" placeholder="e.g. 2" min="0" step="any">
+              <select disabled><option>ml</option></select>
+            </div>
+          </div>
+        </div>
+
+        <div class="calc-step">
+          <div class="calc-step-head"><span class="calc-num">4</span><h3>What dose do you want?</h3></div>
+          <p class="hint">The amount you want in a single dose.</p>
+          <div class="calc-field">
+            <label for="dose">Your target dose</label>
+            <div class="calc-input-row">
+              <input type="number" id="dose" inputmode="decimal" placeholder="e.g. 250" min="0" step="any">
+              <select id="doseUnit">
+                <option value="mcg">mcg</option>
+                <option value="mg">mg</option>
+                <option value="iu">iu</option>
+              </select>
+            </div>
+          </div>
+          <div class="dose-presets" id="presetWrap" style="display:none">
+            <div class="preset-label">Suggested amounts (tap to use):</div>
+            <div class="preset-chips" id="presetChips"></div>
+            <p class="hint" style="margin:12px 0 0 0">Not sure what to enter? Each peptide's <a href="library.html">page</a> shows the amounts supplier sheets commonly list.</p>
+          </div>
+        </div>
+
+        <!-- Intranasal option: appears when the chosen peptide has a nasal protocol in data.js -->
+        <!-- Suggested schedule for the chosen peptide (from SCHEDULES in data.js) -->
+        <div class="calc-step" id="schedWrap" style="display:none">
+          <div class="calc-step-head"><h3 id="schedTitle">Suggested schedule</h3></div>
+          <p class="hint">What supplier reference sheets commonly show. Not a recommendation.</p>
+          <div id="schedRows"></div>
+        </div>
+        <div class="calc-step" id="nasalWrap" style="display:none">
+          <div class="calc-step-head"><h3 id="nasalTitle">Intranasal option</h3></div>
+          <p class="hint">This peptide is often run intranasally instead of injected. The syringe math above is for injection; the spray protocol is below.</p>
+          <div id="nasalRows"></div>
+          <p class="hint" id="nasalNote" style="margin-top:12px"></p>
+          <div class="result-actions" style="margin-top:14px">
+            <button type="button" class="btn btn-ghost" id="nasalDlBtn">Download image</button>
+          </div>
+        </div>
+
+      </div>
+
+      <aside class="calc-result" aria-live="polite">
+        <h3>Draw to this line</h3>
+        <div id="resultArea">
+          <div class="calc-empty">Fill in the steps and your dose will appear here.</div>
+        </div>
+        <!-- Syringe size picker: rescales the gauge below to the barrel you use -->
+        <div class="syringe-picker" id="syringePicker" role="group" aria-label="Syringe size">
+          <button type="button" class="syr-opt" data-max="50">0.5 ml<span class="lvl">50 units</span></button>
+          <button type="button" class="syr-opt active" data-max="100">1 ml<span class="lvl">100 units</span></button>
+        </div>
+        <!-- Real syringe photo (assets/syringe-diagram.png) with a dynamic fill + draw-line
+             overlaid on top of its barrel. The overlay positions are percentages of the image
+             box, measured from the photo itself, so they track it at any size. -->
+        <div class="syringe-wrap" id="syringeWrap">
+          <img class="syringe-img" id="syringeImg" src="assets/syringe-diagram.png" alt="Syringe" width="1200" height="192">
+          <div class="syringe-fill" id="fill" style="width:0"></div>
+          <div class="syringe-marker" id="marker" style="display:none"></div>
+        </div>
+        <div class="draw-sub" id="drawSub" style="display:none"></div>
+        <!-- Full dose summary: the same rows that print on the downloadable card, so nobody has to download it -->
+        <div id="cardRows" style="display:none;margin-top:14px;text-align:left"></div>
+        <!-- Share buttons: save or copy the result as a branded image -->
+        <div class="result-actions" id="resultActions" style="display:none">
+          <button type="button" class="btn btn-ghost" id="dlBtn">Download image</button>
+          <button type="button" class="btn btn-ghost" id="copyBtn">Copy image</button>
+        </div>
+        <!-- Hidden canvas used to render the shareable dose card -->
+        <canvas id="shareCanvas" style="display:none" aria-hidden="true"></canvas>
+      </aside>
+    </div>
+
+    <div class="disclaimer-strip" style="margin-top:24px">
+      <b>Educational tool only.</b> This helps you understand reconstitution and dosing math. It is not medical advice and not a recommendation of any dose.
+    </div>
+  </div>
+</section>
+
+<!-- ===== YOUR SYRINGE ===== -->
+<section class="calc-section section-dark" id="syringe-sec">
+  <a id="syringe" class="anchor"></a>
+  <div class="wrap">
+    <span class="eyebrow" style="color:var(--teal)">Your syringe</span>
+    <h2 class="display" style="color:#fff;margin:12px 0 10px;font-size:1.5rem">Understanding your syringes</h2>
+    <p style="color:#CFCEC9;max-width:62ch;margin-bottom:28px">There are a few you might reach for. Two small insulin syringes for everyday subcutaneous doses, and a larger one for intramuscular shots or for mixing. Here is the difference, simply.</p>
+
+    <div class="syringe-types syringe-types-3">
+      <div class="syringe-type">
+        <span class="st-badge">subQ</span>
+        <h3 class="display" style="color:#fff;font-size:1.1rem;margin:10px 0 6px">0.5 ml insulin (50 units)</h3>
+        <p style="color:#CFCEC9;font-size:0.9rem">The small one most people reach for. It holds up to 50 units, which is plenty for most subcutaneous doses, and each mark is a single unit. Use this one for any dose under 10 units. Those are nearly impossible to measure on a 1 ml syringe.</p>
+      </div>
+      <div class="syringe-type">
+        <span class="st-badge">subQ</span>
+        <h3 class="display" style="color:#fff;font-size:1.1rem;margin:10px 0 6px">1 ml insulin (100 units)</h3>
+        <p style="color:#CFCEC9;font-size:0.9rem">Same U-100 markings, just a longer barrel that holds up to 100 units. Many use this one for GHK-Cu. Both of these are very common for subcutaneous shots.</p>
+      </div>
+      <div class="syringe-type">
+        <span class="st-badge">IM &amp; mixing</span>
+        <h3 class="display" style="color:#fff;font-size:1.1rem;margin:10px 0 6px">3 ml syringe</h3>
+        <p style="color:#CFCEC9;font-size:0.9rem">A larger syringe for intramuscular shots, like glutathione is often done, and for adding BAC water when you reconstitute.</p>
+      </div>
+    </div>
+
+    <div class="shot-types">
+      <div class="shot-type">
+        <h4>Subcutaneous (subq)</h4>
+        <p>A shot into the layer of fat just under the skin, using a short, thin insulin needle. This is the most common way peptides are given.</p>
+        <p style="margin-top:8px"><b>Where:</b> the top of the glute, the love handles, or the abdomen.</p>
+      </div>
+      <div class="shot-type">
+        <h4>Intramuscular (IM)</h4>
+        <p>A shot into the muscle, using a longer needle. Some compounds, like glutathione, are often done this way, though subq is sometimes possible too. Your supplier's notes tell you which a peptide calls for.</p>
+        <p style="margin-top:8px"><b>Where:</b> the glute or the thigh.</p>
+      </div>
+    </div>
+
+    <h3 class="display" style="color:#fff;font-size:1.05rem;margin:8px 0 18px">Reading the U-100 syringe</h3>
+    <div class="syringe-explain">
+      <div class="se-visual">
+        <svg viewBox="0 0 90 260" aria-hidden="true">
+          <rect x="34" y="12" width="22" height="200" rx="3" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
+          <rect x="36" y="120" width="18" height="90" fill="rgba(197,143,152,0.35)"/>
+          <line x1="56" y1="120" x2="74" y2="120" stroke="var(--teal)" stroke-width="2"/>
+          <text x="78" y="118" font-size="11" font-weight="700" fill="var(--teal)" font-family="Poppins">50</text>
+          <g stroke="rgba(255,255,255,0.4)" stroke-width="1">
+            <line x1="34" y1="32" x2="44" y2="32"/><line x1="34" y1="52" x2="44" y2="52"/>
+            <line x1="34" y1="72" x2="44" y2="72"/><line x1="34" y1="92" x2="44" y2="92"/>
+            <line x1="34" y1="120" x2="46" y2="120"/><line x1="34" y1="148" x2="44" y2="148"/>
+            <line x1="34" y1="176" x2="44" y2="176"/><line x1="34" y1="204" x2="46" y2="204"/>
+          </g>
+          <text x="20" y="36" font-size="9" fill="#CFCEC9" font-family="Poppins" text-anchor="end">10</text>
+          <text x="20" y="124" font-size="9" fill="var(--teal)" font-family="Poppins" text-anchor="end">50</text>
+          <text x="20" y="208" font-size="9" fill="#CFCEC9" font-family="Poppins" text-anchor="end">100</text>
+          <rect x="40" y="2" width="10" height="12" rx="2" fill="rgba(255,255,255,0.25)"/>
+          <rect x="37" y="210" width="16" height="14" rx="2" fill="rgba(255,255,255,0.2)"/>
+        </svg>
+      </div>
+      <div class="se-facts">
+        <div class="se-fact"><b>1 full syringe</b><span>= 100 units = 1.0 ml</span></div>
+        <div class="se-fact"><b>Half full</b><span>= 50 units = 0.5 ml</span></div>
+        <div class="se-fact"><b>A quarter</b><span>= 25 units = 0.25 ml</span></div>
+        <div class="se-fact"><b>The small marks</b><span>on the 1 ml syringe each count 2 units. On the 0.5 ml syringe each mark is 1 unit, which is why small doses are easier to read on it</span></div>
+      </div>
+    </div>
+
+    <div class="units-guide units-guide-dark">
+      <h3 class="display" style="color:#fff">Units to milligrams, at a glance</h3>
+      <p class="units-sub" style="color:#CFCEC9">The same 50 units means a different dose depending on how strong your mix is. Stronger concentration, more milligrams per unit.</p>
+      <div class="units-cards">
+        <div class="units-card units-card-dark"><span class="uc-conc">1 mg / ml</span><span class="uc-eq" style="color:#CFCEC9">50 units = <b style="color:#fff">0.5 mg</b></span></div>
+        <div class="units-card units-card-dark"><span class="uc-conc">2 mg / ml</span><span class="uc-eq" style="color:#CFCEC9">50 units = <b style="color:#fff">1.0 mg</b></span></div>
+        <div class="units-card units-card-dark"><span class="uc-conc">5 mg / ml</span><span class="uc-eq" style="color:#CFCEC9">50 units = <b style="color:#fff">2.5 mg</b></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== RECONSTITUTION ===== -->
+<section class="calc-section section-light" id="recon-sec">
+  <a id="recon" class="anchor"></a>
+  <div class="wrap" style="max-width:820px">
+    <span class="eyebrow">The Basics</span>
+    <h2 class="display" style="margin:12px 0 10px;font-size:1.5rem">How to reconstitute, step by step</h2>
+    <p style="color:var(--ink-soft);margin-bottom:8px">"Reconstitute" just means mixing your dry peptide powder with BAC water so you can use it.</p>
+
+    <div class="callout callout-teal">
+      <b>The one idea to hold onto.</b> Add the water gently down the side of the vial, swirl, never shake, and let the powder dissolve on its own. That is reconstitution in a sentence.
+    </div>
+
+    <div id="steps"></div>
+
+    <h3 class="display" style="font-size:1.05rem;margin:32px 0 14px">The water to use</h3>
+    <p style="color:var(--ink-soft);margin-bottom:14px">Bacteriostatic water is the standard for most peptides. It has a preservative, so the vial lasts. It is the standard choice.</p>
+    <div id="waterCards"></div>
+  </div>
+</section>
+
+<!-- ===== SUPPLIES ===== -->
+<section class="calc-section section-tint" id="supplies-sec">
+  <a id="supplies" class="anchor"></a>
+  <div class="wrap" style="max-width:820px">
+    <span class="eyebrow">The Supplies</span>
+    <h2 class="display" style="margin:12px 0 10px;font-size:1.5rem">What you need on hand</h2>
+    <p style="color:var(--ink-soft);margin-bottom:8px">The small items that make this easier and are worth keeping stocked.</p>
+
+    <div class="callout"><b>A quick word on needles.</b> Needle thickness is measured in "gauge," and it works backwards: the bigger the number, the thinner the needle. A 31 gauge is among the thinnest, which most people find the most comfortable.</div>
+
+    <div class="supply-grid" id="supplyGrid"></div>
+
+  </div>
+</section>
+
+<!-- ===== WHERE TO BUY ===== -->
+<div id="orderSec"></div>
+
+<div id="communityBand"></div>
+
+<div id="footer"></div>
+<script src="data.js"></script>
+<script>
+  document.getElementById('nav').innerHTML = renderNav('calc'); initMobileNav();
+  document.getElementById('footer').innerHTML = renderFooter();
+  document.getElementById('communityBand').innerHTML = renderCommunityBand();
+
+  // optional store sections (only show when STORE_URL is set in config.js)
+  document.getElementById('waterCards').innerHTML = renderWaterCard();
+  document.getElementById('orderSec').innerHTML = renderOrderSection();
+
+  // reconstitution steps
+  const steps = [
+    ["Gather your supplies", "Your peptide vial, your BAC water, a sterile syringe, and alcohol pads. Have everything in front of you before you start."],
+    ["Clean the tops", "Wipe the rubber stopper on both the peptide vial and the water vial with an alcohol pad. Let them air dry."],
+    ["Draw the water", "Draw your measured amount of BAC water into the syringe. The calculator and your reference tell you how much."],
+    ["Add it slowly", "Insert the needle and let the water run slowly down the inside wall of the vial, not straight onto the powder. This protects the peptide."],
+    ["Swirl, never shake", "Gently roll or swirl the vial between your fingers until the powder dissolves. Shaking can damage the peptide. Then let the vial sit for 15 to 30 minutes so it finishes dissolving on its own."],
+    ["Inspect and store", "The liquid should look clear to slightly cloudy with no floating bits. Store it in the fridge per your peptide's instructions."]
+  ];
+  document.getElementById('steps').innerHTML = `<div class="calc-steps" style="margin-top:20px">` + steps.map((s,i) => `
+    <div class="calc-step">
+      <div class="calc-step-head"><span class="calc-num">${i+1}</span><h3>${s[0]}</h3></div>
+      <p class="hint" style="margin-bottom:0">${s[1]}</p>
+    </div>`).join("") + `</div>`;
+
+  // supplies come from config.js (SUPPLIES)
+  const supplies = SUPPLIES;
+  document.getElementById('supplyGrid').innerHTML = supplies.map(s => `
+    <${s.url?'a':'div'} class="supply-card"${s.url?` href="${s.url}" target="_blank" rel="noopener nofollow"`:''}>
+      <div class="supply-name">${s.name}</div>
+      <div class="supply-desc">${s.desc}</div>
+      ${s.url?'<div class="supply-link">View on store →</div>':''}
+    </${s.url?'a':'div'}>`).join("");
+
+  // The fill and marker sit on top of the syringe photo as percentages of its width —
+  // these match where the clear part of the barrel falls in the two photos below (same
+  // crop, just relabeled for each syringe's own max), so the math works for both.
+  const fillLeftPct = 26.6, fillWidthPct = 57.6;
+  const SYRINGE_IMAGES = {50:'assets/syringe-diagram-50.png', 100:'assets/syringe-diagram.png'};
+  let syringeMax = 100; // 100 = 1 ml syringe, 50 = 0.5 ml syringe
+
+  const mg=document.getElementById('mg'),ml=document.getElementById('ml'),dose=document.getElementById('dose'),
+        doseUnit=document.getElementById('doseUnit'),pepSelect=document.getElementById('pepSelect'),
+        presetWrap=document.getElementById('presetWrap'),presetChips=document.getElementById('presetChips'),
+        resultArea=document.getElementById('resultArea'),fill=document.getElementById('fill'),
+        marker=document.getElementById('marker'),drawSub=document.getElementById('drawSub'),
+        syringeImgEl=document.getElementById('syringeImg'),
+        resultActions=document.getElementById('resultActions');
+  let lastCalc=null; // holds the current result so the image buttons can use it
+  let currentNasal=null; // holds the selected peptide's nasal protocol for its own card image
+
+  let opts="";
+  Object.entries(CATEGORIES).forEach(([key,c])=>{
+    const peps=PEPTIDES.filter(p=>p.cat===key&&p.presets);
+    if(!peps.length)return;
+    opts+=`<optgroup label="${c.name}">`+peps.map(p=>`<option value="${p.slug}">${p.name}</option>`).join("")+`</optgroup>`;
+  });
+  pepSelect.innerHTML=`<option value="">Choose a peptide (optional)</option>`+opts;
+
+  function loadPeptide(slug){
+    const p=PEPTIDES.find(x=>x.slug===slug);
+    presetChips.innerHTML="";
+    if(!p){presetWrap.style.display='none';nasalWrap.style.display='none';schedWrap.style.display='none';return;}
+    if(p.recon){mg.value=p.recon.mg;ml.value=p.recon.ml;}
+    // suggested schedule card (timing / frequency / duration)
+    const sc=(typeof SCHEDULES!=='undefined')?SCHEDULES[slug]:null;
+    if(sc){
+      schedTitle.textContent=`${p.name}: suggested schedule`;
+      schedRows.innerHTML=[['Frequency',sc.frequency],['Timing',sc.timing],['Duration',sc.duration]]
+        .filter(r=>r[1]).map(r=>`<div class="spec-row"><span class="k">${r[0]}</span><span class="v">${r[1]}</span></div>`).join("");
+      schedWrap.style.display='block';
+    } else {schedWrap.style.display='none';}
+    // intranasal card, for peptides that carry a nasal protocol
+    if(p.nasal){
+      nasalTitle.textContent=`${p.name} intranasal option`;
+      nasalRows.innerHTML=p.nasal.rows.map(r=>`<div class="spec-row"><span class="k">${r[0]}</span><span class="v">${r[1]}</span></div>`).join("");
+      nasalNote.textContent=p.nasal.note||"";
+      currentNasal={name:p.name,slug:p.slug,rows:p.nasal.rows,note:p.nasal.note||""};
+      nasalWrap.style.display='block';
+    } else {nasalWrap.style.display='none';currentNasal=null;}
+    if(p.presets&&p.presets.length){
+      presetWrap.style.display='block';
+      currentPresets=p.presets;
+      dose.value=p.presets[0].dose;doseUnit.value=p.presets[0].unit;
+      renderChips();
+    } else {presetWrap.style.display='none';currentPresets=null;}
+    calc();
+  }
+
+  // Suggested-amount chips, shown in whatever unit the dropdown is set to.
+  // mg and mcg convert to each other; iu chips stay in iu.
+  let currentPresets=null;
+  function toUnit(val,from,to){
+    const v=parseFloat(val);
+    if(from===to)return v;
+    if(from==='mcg'&&to==='mg')return v/1000;
+    if(from==='mg'&&to==='mcg')return v*1000;
+    return null; // iu cannot convert to a weight
+  }
+  function fmt(n){return n.toLocaleString(undefined,{maximumFractionDigits:4});}
+  function renderChips(){
+    presetChips.innerHTML="";
+    if(!currentPresets)return;
+    const u=doseUnit.value;
+    currentPresets.forEach(ps=>{
+      const conv=toUnit(ps.dose,ps.unit,u);
+      const showVal=conv===null?parseFloat(ps.dose):conv, showUnit=conv===null?ps.unit:u;
+      const b=document.createElement('button');b.className='preset-chip';
+      b.innerHTML=`${fmt(showVal)} ${showUnit}<span class="lvl">${ps.label}</span>`;
+      b.onclick=()=>{dose.value=showVal;doseUnit.value=showUnit;calc();};
+      presetChips.appendChild(b);
+    });
+  }
+  // when the unit changes, keep the same actual dose (100 mcg becomes 0.1 mg) and redraw the chips
+  let lastUnit=doseUnit.value;
+  doseUnit.addEventListener('change',()=>{
+    const conv=toUnit(dose.value,lastUnit,doseUnit.value);
+    if(conv!==null&&!isNaN(conv))dose.value=fmt(conv).replace(/,/g,'');
+    lastUnit=doseUnit.value;
+    renderChips();calc();
+  });
+  pepSelect.addEventListener('change',()=>loadPeptide(pepSelect.value));
+
+  // preselect from ?p=
+  const pre=new URLSearchParams(location.search).get('p');
+  if(pre){pepSelect.value=pre;loadPeptide(pre);}
+
+  function calc(){
+    const mgV=parseFloat(mg.value),mlV=parseFloat(ml.value),doseV=parseFloat(dose.value);
+    if(!(mgV>0)||!(mlV>0)||!(doseV>0)){
+      resultArea.innerHTML=`<div class="calc-empty">Fill in the steps and your dose will appear here.</div>`;
+      fill.style.width=0;marker.style.display='none';drawSub.style.display='none';
+      lastCalc=null;resultActions.style.display='none';cardRows.style.display='none';return;
+    }
+    const concMgMl=mgV/mlV,doseMg=doseUnit.value==='mcg'?doseV/1000:doseV,drawMl=doseMg/concMgMl,units=drawMl*100,concMcgMl=concMgMl*1000;
+    resultArea.innerHTML=`<div class="draw-num">${units.toLocaleString(undefined,{maximumFractionDigits:1})}</div><div class="draw-unit">units on the syringe</div>`;
+    const pct=Math.min(units,syringeMax)/syringeMax;
+    fill.style.width=(fillWidthPct*pct)+'%';
+    marker.style.left=(fillLeftPct+fillWidthPct*pct)+'%';
+    marker.style.display=units<=syringeMax?'block':'none';
+    drawSub.style.display='block';
+    const overFix=syringeMax===50?'switch to the 1 ml syringe, draw it in more than one fill,':'draw it in more than one fill';
+    let warn=units>syringeMax?`<br><span style="color:#b06a2a">That is more than this syringe holds. You would ${overFix} or use a different concentration.</span>`:"";
+    // concentration reads in the same unit the dose was entered in (mg, mcg, or iu)
+    const concLabel=doseUnit.value==='iu'?`${concMgMl.toLocaleString(undefined,{maximumFractionDigits:0})} iu per ml`:doseUnit.value==='mg'?`${concMgMl.toLocaleString(undefined,{maximumFractionDigits:2})} mg per ml`:`${concMcgMl.toLocaleString(undefined,{maximumFractionDigits:0})} mcg per ml`;
+    const dosesPerVial=Math.floor(mgV/doseMg);
+    const doseLine=dosesPerVial>=1?`<br>This vial gives about <b>${dosesPerVial.toLocaleString()} ${dosesPerVial===1?'dose':'doses'}</b> at this amount.`:"";
+    drawSub.innerHTML=`That is <b>${drawMl.toLocaleString(undefined,{maximumFractionDigits:3})} ml</b>.<br>Your vial holds about <b>${concLabel}</b>.${doseLine}${warn}`;
+    // save everything the shareable image needs
+    const pepName=pepSelect.value?pepSelect.options[pepSelect.selectedIndex].text:"";
+    // suggested schedule for this peptide, printed on the downloadable card
+    const sched=(pepSelect.value&&typeof SCHEDULES!=='undefined')?SCHEDULES[pepSelect.value]:null;
+    lastCalc={units,drawMl,concLabel,dosesPerVial,mgV,mlV,doseV,unit:doseUnit.value,pepName,syringeMax,sched};
+    // on-screen summary: same rows as the card
+    const cr=[
+      ['Syringe',syringeMax===50?'0.5 ml (50 units)':'1 ml (100 units)'],
+      ['In the vial',`${mgV.toLocaleString()} ${doseUnit.value==='iu'?'iu':'mg'}`],
+      ['BAC water added',`${mlV.toLocaleString()} ml`],
+      ['Target dose',`${doseV.toLocaleString()} ${doseUnit.value}`],
+      ['Draw volume',`${drawMl.toLocaleString(undefined,{maximumFractionDigits:3})} ml`],
+      ['Units on the syringe',units.toLocaleString(undefined,{maximumFractionDigits:1})],
+      ['Concentration',concLabel]
+    ];
+    if(dosesPerVial>=1)cr.push(['Doses in this vial',`about ${dosesPerVial.toLocaleString()}`]);
+    // schedule rows are left off here (the schedule card below the inputs already shows them); they still print on the downloadable image
+    cardRows.innerHTML=`<div class="calc-step-head" style="margin-bottom:4px"><h3>${pepName||'Your dose'}: full summary</h3></div>`+
+      cr.map(r=>`<div class="spec-row"><span class="k">${r[0]}</span><span class="v">${r[1]}</span></div>`).join("");
+    cardRows.style.display='block';
+    resultActions.style.display='flex';
+  }
+  [mg,ml,dose,doseUnit].forEach(el=>el.addEventListener('input',calc));
+
+  // syringe size picker: rescale the gauge and rerun the math
+  document.querySelectorAll('#syringePicker .syr-opt').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      syringeMax=parseInt(btn.dataset.max,10);
+      document.querySelectorAll('#syringePicker .syr-opt').forEach(b=>b.classList.toggle('active',b===btn));
+      syringeImgEl.src=SYRINGE_IMAGES[syringeMax];
+      calc();
+    });
+  });
+
+  /* ===== Shareable dose card image (download / copy) ===== */
+  const shareCanvas=document.getElementById('shareCanvas');
+  const dlBtn=document.getElementById('dlBtn'),copyBtn=document.getElementById('copyBtn');
+
+  // hide the copy button in browsers that cannot copy images to the clipboard
+  if(!(navigator.clipboard&&window.ClipboardItem))copyBtn.style.display='none';
+
+  // make sure the Poppins webfont is ready before drawing text on the canvas
+  async function fontsReady(){
+    try{
+      await Promise.all(['600 26px Poppins','700 54px Poppins','700 150px Poppins','500 30px Poppins','600 30px Poppins','500 24px Poppins']
+        .map(f=>document.fonts.load(f)));
+      await document.fonts.ready;
+    }catch(e){/* fall back to system font, still fine */}
+  }
+
+  // both syringe photos used on the downloadable card (same files as the on-page gauge),
+  // preloaded up front so drawCard() can pick the right one for the selected size
+  const syringeImgs={};
+  const syringeImgReady=Promise.all(Object.entries(SYRINGE_IMAGES).map(([max,src])=>new Promise(res=>{
+    const img=new Image();
+    img.onload=()=>res();
+    img.src=src;
+    syringeImgs[max]=img;
+  })));
+
+  function drawCard(){
+    const d=lastCalc;if(!d)return null;
+    // detail rows are built first so the card height can grow to fit them
+    const rows=[
+      ['Syringe',(d.syringeMax||100)===50?'0.5 ml (50 units)':'1 ml (100 units)'],
+      ['In the vial',`${d.mgV.toLocaleString()} mg`],
+      ['BAC water added',`${d.mlV.toLocaleString()} ml`],
+      ['Target dose',`${d.doseV.toLocaleString()} ${d.unit}`],
+      ['Draw volume',`${d.drawMl.toLocaleString(undefined,{maximumFractionDigits:3})} ml`],
+      ['Concentration',d.concLabel]
+    ];
+    if(d.dosesPerVial>=1)rows.push(['Doses in this vial',`about ${d.dosesPerVial.toLocaleString()}`]);
+    // suggested schedule rows, when a peptide with one is selected
+    if(d.sched){
+      if(d.sched.frequency)rows.push(['Frequency',d.sched.frequency]);
+      if(d.sched.timing)rows.push(['Timing',d.sched.timing]);
+      if(d.sched.duration)rows.push(['Duration',d.sched.duration]);
+    }
+    const over=d.units>(d.syringeMax||100);
+    const W=1080,P=80; // canvas width and side padding
+    const syringeImg=syringeImgs[d.syringeMax||100];
+    // the syringe photo, sized to the card's width, sets how far down the detail rows start
+    const sx=P,sy=460,sw=W-P*2,sh=sw*(syringeImg.naturalHeight/syringeImg.naturalWidth||0.16);
+    const rowsTop=sy+sh+70;
+    const H=rowsTop+rows.length*68+(over?56:0)+170; // height grows with the row count
+    shareCanvas.width=W;shareCanvas.height=H;
+    const ctx=shareCanvas.getContext('2d');
+    const cs=getComputedStyle(document.documentElement),teal=cs.getPropertyValue('--teal').trim(),tealDeep=cs.getPropertyValue('--teal-deep').trim(),ink='#202020',inkSoft='#5A5A56',inkFaint='#8C8C86',line='#E5E1DA';
+    const F=w=>`${w} Poppins, -apple-system, sans-serif`;
+
+    // background
+    ctx.fillStyle='#FBF7F4';ctx.fillRect(0,0,W,H);
+
+    // eyebrow + title
+    ctx.fillStyle=teal;ctx.font=F('600 26px');
+    ctx.fillText('PEPTIDE GUIDE  ·  DOSE CARD',P,130);
+    ctx.fillStyle=ink;ctx.font=F('700 54px');
+    ctx.fillText((d.pepName||'Your dose').toUpperCase(),P,200);
+
+    // big number with its label beside it
+    const unitsTxt=d.units.toLocaleString(undefined,{maximumFractionDigits:1});
+    ctx.fillStyle=tealDeep;ctx.font=F('700 150px');
+    ctx.fillText(unitsTxt,P,380);
+    const numW=ctx.measureText(unitsTxt).width;
+    ctx.fillStyle=inkSoft;ctx.font=F('500 30px');
+    ctx.fillText('units on the syringe',P+numW+24,380);
+
+    // syringe photo, with the fill and the draw-line positioned on top as a
+    // percentage of the image — the same photo and the same math as the on-page gauge.
+    ctx.drawImage(syringeImg,sx,sy,sw,sh);
+    const fillLeftPct=0.266,fillWidthPct=0.576;
+    const sMax=d.syringeMax||100;
+    const capped=Math.min(d.units,sMax)/sMax;
+    const fx=sx+sw*fillLeftPct,fy=sy+sh*0.252,fw=sw*fillWidthPct,fh=sh*0.506;
+    ctx.fillStyle=teal+'59';
+    ctx.fillRect(fx,fy,fw*capped,fh);
+    if(d.units<=sMax){
+      const mx=fx+fw*capped;
+      ctx.strokeStyle=tealDeep;ctx.lineWidth=5;
+      ctx.beginPath();ctx.moveTo(mx,sy+sh*0.15);ctx.lineTo(mx,sy+sh*0.85);ctx.stroke();
+    }
+
+    // detail rows (built above, before the canvas was sized)
+    let ry=rowsTop;
+    rows.forEach(r=>{
+      ctx.strokeStyle=line;ctx.lineWidth=2;
+      ctx.beginPath();ctx.moveTo(P,ry+22);ctx.lineTo(W-P,ry+22);ctx.stroke();
+      ctx.fillStyle=inkFaint;ctx.font=F('500 30px');ctx.fillText(r[0],P,ry);
+      const labelW=ctx.measureText(r[0]).width;
+      // long values (like timing notes) shrink until they fit on one line
+      let size=30;ctx.font=F(`600 ${size}px`);
+      const avail=W-P*2-labelW-30;
+      while(size>20&&ctx.measureText(r[1]).width>avail){size-=2;ctx.font=F(`600 ${size}px`);}
+      ctx.fillStyle=ink;ctx.textAlign='right';ctx.fillText(r[1],W-P,ry);ctx.textAlign='left';
+      ry+=68;
+    });
+
+    // more-than-one-syringe note
+    if(over){
+      ctx.fillStyle='#b06a2a';ctx.font=F('500 26px');
+      ctx.fillText('More than one full syringe. Draw it in more than one fill.',P,ry+8);
+      ry+=50;
+    }
+
+    // footer
+    ctx.strokeStyle=line;ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(P,H-140);ctx.lineTo(W-P,H-140);ctx.stroke();
+    ctx.fillStyle=inkFaint;ctx.font=F('500 24px');
+    ctx.fillText('Educational tool only. Not medical advice.',P,H-88);
+    ctx.fillStyle=tealDeep;ctx.font=F('600 28px');ctx.textAlign='right';
+    ctx.fillText(SITE_DOMAIN,W-P,H-88);ctx.textAlign='left';
+    return shareCanvas;
+  }
+
+  // wraps a long note into lines that fit the card width
+  function wrapText(ctx,text,maxW){
+    const words=text.split(' '),lines=[];let line='';
+    words.forEach(w=>{
+      const t=line?line+' '+w:w;
+      if(ctx.measureText(t).width>maxW&&line){lines.push(line);line=w;}else{line=t;}
+    });
+    if(line)lines.push(line);
+    return lines;
+  }
+
+  /* ===== Intranasal protocol card image (no dose math, just the protocol) ===== */
+  function drawNasalCard(){
+    const n=currentNasal;if(!n)return null;
+    const W=1080,P=80,rowsTop=310;
+    // measure the note first so the card height fits it
+    shareCanvas.width=W;shareCanvas.height=100;
+    let ctx=shareCanvas.getContext('2d');
+    const F=w=>`${w} Poppins, -apple-system, sans-serif`;
+    ctx.font=F('500 26px');
+    const noteLines=n.note?wrapText(ctx,n.note,W-P*2):[];
+    const H=rowsTop+n.rows.length*68+(noteLines.length?noteLines.length*40+30:0)+170;
+    shareCanvas.height=H;
+    ctx=shareCanvas.getContext('2d');
+    const cs=getComputedStyle(document.documentElement),teal=cs.getPropertyValue('--teal').trim(),tealDeep=cs.getPropertyValue('--teal-deep').trim(),ink='#202020',inkFaint='#8C8C86',line='#E5E1DA';
+
+    // background
+    ctx.fillStyle='#FBF7F4';ctx.fillRect(0,0,W,H);
+
+    // eyebrow + title
+    ctx.fillStyle=teal;ctx.font=F('600 26px');
+    ctx.fillText('PEPTIDE GUIDE  ·  INTRANASAL PROTOCOL',P,130);
+    ctx.fillStyle=ink;ctx.font=F('700 54px');
+    ctx.fillText(n.name.toUpperCase(),P,200);
+    ctx.fillStyle=inkFaint;ctx.font=F('500 30px');
+    ctx.fillText('Intranasal option',P,248);
+
+    // protocol rows, same layout as the dose card
+    let ry=rowsTop;
+    n.rows.forEach(r=>{
+      ctx.strokeStyle=line;ctx.lineWidth=2;
+      ctx.beginPath();ctx.moveTo(P,ry+22);ctx.lineTo(W-P,ry+22);ctx.stroke();
+      ctx.fillStyle=inkFaint;ctx.font=F('500 30px');ctx.fillText(r[0],P,ry);
+      const labelW=ctx.measureText(r[0]).width;
+      let size=30;ctx.font=F(`600 ${size}px`);
+      const avail=W-P*2-labelW-30;
+      while(size>20&&ctx.measureText(r[1]).width>avail){size-=2;ctx.font=F(`600 ${size}px`);}
+      ctx.fillStyle=ink;ctx.textAlign='right';ctx.fillText(r[1],W-P,ry);ctx.textAlign='left';
+      ry+=68;
+    });
+
+    // wrapped note under the rows
+    if(noteLines.length){
+      ctx.fillStyle=inkFaint;ctx.font=F('500 26px');
+      ry+=10;
+      noteLines.forEach(l=>{ctx.fillText(l,P,ry);ry+=40;});
+    }
+
+    // footer
+    ctx.strokeStyle=line;ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(P,H-140);ctx.lineTo(W-P,H-140);ctx.stroke();
+    ctx.fillStyle=inkFaint;ctx.font=F('500 24px');
+    ctx.fillText('Educational tool only. Not medical advice.',P,H-88);
+    ctx.fillStyle=tealDeep;ctx.font=F('600 28px');ctx.textAlign='right';
+    ctx.fillText(SITE_DOMAIN,W-P,H-88);ctx.textAlign='left';
+    return shareCanvas;
+  }
+
+  document.getElementById('nasalDlBtn').addEventListener('click',async()=>{
+    if(!currentNasal)return;
+    await fontsReady();drawNasalCard();
+    const a=document.createElement('a');
+    a.download=`peptide-${currentNasal.slug}-intranasal-card.png`;
+    a.href=shareCanvas.toDataURL('image/png');
+    a.click();
+    flash(document.getElementById('nasalDlBtn'),'Saved');
+  });
+
+  function cardFilename(){
+    const slug=lastCalc&&lastCalc.pepName?lastCalc.pepName.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''):'dose';
+    return `peptide-${slug}-dose-card.png`;
+  }
+
+  // brief button feedback, then restore the label
+  function flash(btn,msg){
+    const old=btn.textContent;btn.textContent=msg;btn.disabled=true;
+    setTimeout(()=>{btn.textContent=old;btn.disabled=false;},1600);
+  }
+
+  dlBtn.addEventListener('click',async()=>{
+    if(!lastCalc)return;
+    await Promise.all([fontsReady(),syringeImgReady]);drawCard();
+    const a=document.createElement('a');
+    a.download=cardFilename();
+    a.href=shareCanvas.toDataURL('image/png');
+    a.click();
+    flash(dlBtn,'Saved');
+  });
+
+  copyBtn.addEventListener('click',()=>{
+    if(!lastCalc)return;
+    // the promise-inside-ClipboardItem pattern keeps Safari happy
+    const blobPromise=(async()=>{
+      await Promise.all([fontsReady(),syringeImgReady]);drawCard();
+      return await new Promise(res=>shareCanvas.toBlob(res,'image/png'));
+    })();
+    navigator.clipboard.write([new ClipboardItem({'image/png':blobPromise})])
+      .then(()=>flash(copyBtn,'Copied'))
+      .catch(async()=>{
+        // clipboard blocked: fall back to downloading instead
+        await blobPromise;
+        const a=document.createElement('a');
+        a.download=cardFilename();
+        a.href=shareCanvas.toDataURL('image/png');
+        a.click();
+        flash(copyBtn,'Saved instead');
+      });
+  });
+
+  // sticky tab active state on scroll
+  const tabs=[...document.querySelectorAll('.calc-tab')];
+  const secs=['calc','syringe-sec','recon-sec','supplies-sec','order-sec'].map(id=>document.getElementById(id));
+  const tabKeys=['calc','syringe','recon','supplies','order'];
+  window.addEventListener('scroll',()=>{
+    let cur=0;
+    secs.forEach((s,i)=>{if(s&&s.getBoundingClientRect().top<=120)cur=i;});
+    tabs.forEach((t,i)=>t.classList.toggle('active',i===cur));
+  },{passive:true});
+</script>
+</body>
+</html>

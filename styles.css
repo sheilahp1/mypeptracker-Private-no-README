@@ -1,0 +1,742 @@
+/* ============================================
+   PEPTIDE EDUCATION LIBRARY — "The Calm Clinic"
+   Shared stylesheet
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
+
+:root {
+  /* Core palette — warm clinical */
+  --bg:          #FBF7F4;   /* warm white, borrowed from brand */
+  --surface:     #FFFFFF;   /* card surfaces */
+  --ink:         #2A2026;   /* near-black text */
+  --ink-soft:    #5A5A56;   /* secondary text */
+  --ink-faint:   #8C8C86;   /* captions, meta */
+  --line:        #E9E5DE;   /* hairline borders */
+  --line-soft:   #F2EEE7;   /* very soft fills */
+  --teal:        #4A2F3B;   /* trust accent — actions, key markers */
+  --teal-deep:   #2F1D26;   /* hover */
+  --teal-wash:   #F8EFEC;   /* teal tint backgrounds */
+  --amber-wash:  #FBF4E6;   /* gentle caution background */
+  --amber-line:  #E8D5A8;
+  --shadow:      0 1px 2px rgba(32,32,32,0.04), 0 8px 24px rgba(32,32,32,0.05);
+  --shadow-lg:   0 2px 4px rgba(32,32,32,0.05), 0 16px 48px rgba(32,32,32,0.08);
+  --radius:      16px;
+  --radius-sm:   10px;
+  --maxw:        1080px;
+
+  /* Category colors — soft, distinct, never loud */
+  --c-weight:    #C77B53;
+  --c-muscle:    #B0613F;
+  --c-gh:        #6E7FB8;
+  --c-brain:     #7E6BB0;
+  --c-energy:    #C9A23F;
+  --c-skin:      #4FA3A0;
+  --c-sexual:    #C77B9C;
+  --c-immunity:  #5FA37C;
+  --c-hormonal:  #B5894F;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.6;
+  font-size: 17px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- Typography ---------- */
+h1, h2, h3, .eyebrow, .nav-logo, .btn, .cat-card-name, .pep-name {
+  font-family: 'Poppins', sans-serif;
+}
+
+.display {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+  line-height: 1.15;
+}
+
+h1 { font-size: clamp(2rem, 5vw, 3.1rem); }
+h2 { font-size: clamp(1.5rem, 3.5vw, 2.1rem); }
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--teal);
+}
+
+a { color: var(--teal-deep); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ---------- Layout ---------- */
+.wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
+.section { padding: 72px 0; }
+.section-tight { padding: 48px 0; }
+
+/* ---------- Top navigation ---------- */
+/* The nav is rendered inside <div id="nav">, so the wrapper is what sticks.
+   (A sticky element only sticks inside its parent, and the old parent was
+   exactly the nav's own height, so it never stayed on screen.) */
+#nav { position: sticky; top: 0; z-index: 50; }
+.nav {
+  background: rgba(254,252,249,0.88);
+  backdrop-filter: saturate(180%) blur(12px);
+  border-bottom: 1px solid var(--line);
+}
+.nav-inner {
+  max-width: var(--maxw); margin: 0 auto; padding: 14px 24px;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+}
+.nav-logo {
+  display: flex; align-items: center; gap: 11px;
+}
+.nav-logo:hover { text-decoration: none; }
+.nav-logo-text {
+  display: flex; flex-direction: column; line-height: 1.05;
+  text-transform: uppercase; font-weight: 700; font-size: 0.98rem;
+  letter-spacing: 0.1em; color: var(--ink);
+}
+.nav-logo-text small {
+  font-size: 0.6rem; font-weight: 600; letter-spacing: 0.16em;
+  color: var(--teal); margin-top: 3px;
+}
+.nav-links { display: flex; align-items: center; gap: 8px; }
+.nav-links a {
+  color: var(--ink-soft); font-size: 0.9rem; font-weight: 500;
+  padding: 8px 12px; border-radius: 8px;
+}
+.nav-links a:hover { color: var(--ink); background: var(--line-soft); text-decoration: none; }
+.nav-cta {
+  background: var(--teal); color: #fff !important;
+  padding: 9px 16px !important; border-radius: 9px;
+  font-weight: 600 !important;
+}
+.nav-cta:hover { background: var(--line-soft); color: var(--ink) !important; }
+/* Outlined pill link to the Skool community, same bubble as labs and COA sites */
+.nav-circle {
+  display: inline-flex; align-items: center; gap: 0.55rem;
+  color: var(--ink) !important; font-size: 0.9rem; font-weight: 500;
+  border: 1px solid currentColor; border-radius: 100px;
+  padding: 8px 16px !important; background: transparent; white-space: nowrap;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.nav-circle:hover { background: var(--ink); color: var(--bg) !important; text-decoration: none; }
+
+/* ---------- Buttons ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 14px 26px; border-radius: 11px;
+  font-weight: 600; font-size: 0.98rem; cursor: pointer;
+  border: 1px solid transparent; transition: all 0.18s ease;
+  text-transform: none; letter-spacing: 0;
+}
+.btn-primary { background: var(--teal); color: #fff; }
+.btn-primary:hover { background: var(--teal-deep); text-decoration: none; transform: translateY(-1px); }
+.btn-ghost { background: var(--surface); color: var(--ink); border-color: var(--line); }
+.btn-ghost:hover { border-color: var(--teal); color: var(--teal-deep); text-decoration: none; }
+.btn-lg { padding: 16px 32px; font-size: 1.05rem; }
+
+/* ---------- Hero ---------- */
+.hero { padding: 80px 0 56px; }
+.hero-grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 56px; align-items: center; }
+.hero h1 { margin: 18px 0 20px; }
+.hero p.lede { font-size: 1.18rem; color: var(--ink-soft); max-width: 32ch; }
+.hero-actions { display: flex; gap: 12px; margin-top: 30px; flex-wrap: wrap; }
+
+.hero-card {
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 28px; box-shadow: var(--shadow);
+}
+.hero-card h3 { text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.82rem; color: var(--ink-faint); margin-bottom: 14px; }
+.hero-card .stat { display: flex; align-items: baseline; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line-soft); }
+.hero-card .stat:last-child { border-bottom: 0; }
+.hero-card .stat b { font-size: 1.5rem; color: var(--teal-deep); font-weight: 700; }
+.hero-card .stat span { color: var(--ink-soft); font-size: 0.92rem; }
+
+/* ---------- Category grid ---------- */
+.cat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+.cat-card {
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 26px 24px; box-shadow: var(--shadow);
+  transition: all 0.18s ease; display: block; color: var(--ink);
+}
+.cat-card:hover { text-decoration: none; transform: translateY(-3px); box-shadow: var(--shadow-lg); border-color: var(--c, var(--teal)); }
+.cat-dot { width: 38px; height: 38px; border-radius: 10px; display: grid; place-items: center; margin-bottom: 16px; background: var(--cw, var(--teal-wash)); }
+.cat-dot svg { width: 20px; height: 20px; }
+.cat-card-name { text-transform: uppercase; letter-spacing: 0.07em; font-weight: 600; font-size: 1rem; margin-bottom: 6px; }
+.cat-card-desc { color: var(--ink-soft); font-size: 0.92rem; }
+.cat-card-count { color: var(--ink-faint); font-size: 0.82rem; margin-top: 12px; }
+
+/* ---------- Peptide list ---------- */
+.pep-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+.pep-card {
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--radius-sm); padding: 22px 24px; box-shadow: var(--shadow);
+  display: flex; flex-direction: column; gap: 8px; transition: all 0.18s ease; color: var(--ink);
+}
+.pep-card:hover { text-decoration: none; transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+.pep-card-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.pep-name { text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; font-size: 1.05rem; }
+.pep-tag { font-size: 0.78rem; color: var(--ink-faint); }
+.pep-card-desc { color: var(--ink-soft); font-size: 0.92rem; }
+
+.uses-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--teal-wash); color: var(--teal-deep);
+  font-size: 0.72rem; font-weight: 600; letter-spacing: 0.02em;
+  padding: 4px 10px; border-radius: 100px; white-space: nowrap;
+}
+.uses-badge svg { width: 12px; height: 12px; }
+
+/* ---------- Peptide detail page ---------- */
+.detail-head { border-bottom: 1px solid var(--line); padding-bottom: 28px; margin-bottom: 8px; }
+.detail-cat { display: inline-block; font-size: 0.78rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 12px; }
+.detail-head h1 { margin-bottom: 12px; }
+.detail-lede { font-size: 1.15rem; color: var(--ink-soft); max-width: 60ch; }
+
+.detail-grid { display: grid; grid-template-columns: 1fr 320px; gap: 40px; margin-top: 40px; align-items: start; }
+.detail-main h2 { text-transform: uppercase; letter-spacing: 0.06em; font-size: 1.05rem; margin: 32px 0 14px; color: var(--ink); }
+.detail-main h2:first-child { margin-top: 0; }
+.detail-main p { color: var(--ink-soft); margin-bottom: 14px; }
+.benefit-list { list-style: none; display: grid; gap: 10px; margin: 4px 0 8px; }
+.benefit-list li { display: flex; gap: 10px; align-items: flex-start; color: var(--ink-soft); }
+.benefit-list li::before { content: ""; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--teal); margin-top: 9px; }
+
+.detail-side { position: sticky; top: 88px; display: grid; gap: 16px; }
+.side-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 22px; box-shadow: var(--shadow); }
+.side-card h3 { text-transform: uppercase; letter-spacing: 0.07em; font-size: 0.78rem; color: var(--ink-faint); margin-bottom: 14px; }
+.spec-row { display: flex; justify-content: space-between; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--line-soft); font-size: 0.92rem; }
+.spec-row:last-child { border-bottom: 0; }
+.spec-row .k { color: var(--ink-faint); }
+.spec-row .v { color: var(--ink); font-weight: 600; text-align: right; }
+
+.source-note { font-size: 0.82rem; color: var(--ink-faint); font-style: italic; margin-top: 10px; line-height: 1.5; }
+
+.source-list { list-style: none; display: grid; gap: 10px; margin: 4px 0 8px; }
+.source-list li { display: flex; gap: 10px; align-items: flex-start; font-size: 0.9rem; line-height: 1.5; }
+.source-list li::before { content: ""; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--teal); margin-top: 8px; }
+.source-list a { color: var(--teal-deep); text-decoration: underline; text-underline-offset: 2px; }
+
+/* ---------- Callouts ---------- */
+.callout {
+  background: var(--amber-wash); border: 1px solid var(--amber-line);
+  border-radius: var(--radius-sm); padding: 18px 20px; margin: 22px 0;
+  font-size: 0.92rem; color: #7a6326;
+}
+.callout b { color: #5e4d1d; }
+.callout-teal { background: var(--teal-wash); border-color: #ECE0DC; color: var(--teal-deep); }
+.callout-teal b { color: var(--teal-deep); }
+
+/* ---------- Calculator ---------- */
+.calc-shell { display: grid; grid-template-columns: 1fr 360px; gap: 36px; align-items: start; }
+.calc-steps { display: grid; gap: 20px; }
+.calc-step { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px 26px; box-shadow: var(--shadow); }
+.calc-step-head { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+.calc-num { flex: none; width: 30px; height: 30px; border-radius: 50%; background: var(--teal); color: #fff; display: grid; place-items: center; font-weight: 700; font-size: 0.9rem; }
+.calc-step h3 { text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.95rem; }
+.calc-step .hint { color: var(--ink-faint); font-size: 0.88rem; margin: 2px 0 16px 42px; }
+.calc-field { margin-left: 42px; }
+.calc-field label { display: block; font-size: 0.82rem; color: var(--ink-soft); font-weight: 500; margin-bottom: 7px; }
+.calc-input-row { display: flex; gap: 10px; align-items: stretch; }
+.calc-input-row input, .calc-input-row select {
+  flex: 1; font-family: inherit; font-size: 1.05rem; color: var(--ink);
+  padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg);
+  -webkit-appearance: none; appearance: none;
+}
+.calc-input-row input:focus, .calc-input-row select:focus { outline: 2px solid var(--teal); outline-offset: 1px; border-color: var(--teal); }
+.calc-input-row select { flex: 0 0 110px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%238C8C86' stroke-width='1.5' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 34px; }
+
+/* Result panel with live syringe */
+.calc-result { position: sticky; top: 88px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 28px; box-shadow: var(--shadow-lg); text-align: center; }
+.calc-result h3 { text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.78rem; color: var(--ink-faint); margin-bottom: 18px; }
+.draw-num { font-size: 3.4rem; font-weight: 700; color: var(--teal-deep); line-height: 1; letter-spacing: -0.02em; }
+.draw-unit { font-size: 1rem; color: var(--ink-soft); font-weight: 500; margin-top: 4px; }
+.draw-sub { font-size: 0.86rem; color: var(--ink-faint); margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line-soft); }
+.draw-sub b { color: var(--ink); }
+
+/* syringe size picker above the gauge */
+.syringe-picker { display: flex; justify-content: center; gap: 8px; margin-top: 20px; }
+.syr-opt {
+  font-family: inherit; font-size: 0.82rem; font-weight: 600; text-align: center;
+  padding: 7px 14px; border-radius: 12px; cursor: pointer; line-height: 1.2;
+  background: var(--bg); color: var(--ink-faint);
+  border: 1px solid var(--line); transition: all 0.15s ease;
+}
+.syr-opt .lvl { opacity: 0.7; font-size: 0.68rem; display: block; font-weight: 500; }
+.syr-opt:hover { border-color: var(--teal); color: var(--teal-deep); }
+.syr-opt.active { background: var(--teal-wash); color: var(--teal-deep); border-color: var(--teal-line); }
+
+/* Syringe gauge: a real syringe photo (assets/syringe-diagram.png) with the fill and the
+   draw-line positioned on top as percentages of the image, measured from the photo itself. */
+.syringe-wrap { position: relative; margin: 16px auto 6px; width: 100%; max-width: 360px; aspect-ratio: 1200 / 192; }
+.syringe-img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.syringe-fill {
+  position: absolute; left: 26.6%; top: 25.2%; height: 50.6%; width: 0;
+  background: rgba(74,47,59, 0.35);
+  transition: width 0.4s cubic-bezier(.4,0,.2,1);
+}
+.syringe-marker {
+  position: absolute; left: 26.6%; top: 15%; height: 70%; width: 2.5px;
+  background: var(--teal-deep);
+  transition: left 0.4s cubic-bezier(.4,0,.2,1);
+}
+
+.calc-empty { color: var(--ink-faint); font-size: 0.92rem; padding: 20px 0; }
+
+/* ---------- Footer ---------- */
+.footer { background: var(--ink); color: #CFCEC9; padding: 56px 0 40px; margin-top: 40px; }
+.footer .wrap { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 40px; }
+.footer h4 { color: #fff; text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.78rem; margin-bottom: 16px; }
+.footer a { color: #CFCEC9; font-size: 0.92rem; display: block; margin-bottom: 9px; }
+.footer a:hover { color: #fff; }
+.footer-brand { font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: #fff; margin-bottom: 14px; }
+.footer-fine { color: #8B8A85; font-size: 0.82rem; line-height: 1.6; max-width: 42ch; }
+.footer-legal { border-top: 1px solid #333; margin-top: 36px; padding-top: 24px; font-size: 0.8rem; color: #7A7975; }
+/* The two footer buttons: Circle (teal) and Where to buy (outlined on dark) */
+.footer .footer-btn { display: inline-block; width: 100%; max-width: 260px; text-align: center; margin-bottom: 10px; }
+.footer .footer-btn.btn-primary { color: #fff; }
+.footer .footer-btn.btn-ghost { background: transparent; color: #fff; border-color: #4A4A48; }
+.footer .footer-btn.btn-ghost:hover { border-color: var(--teal); color: var(--teal); }
+
+/* ---------- Disclaimer strip ---------- */
+.disclaimer-strip {
+  background: var(--line-soft); border: 1px solid var(--line);
+  border-radius: var(--radius-sm); padding: 18px 22px; margin: 0 0 8px;
+  font-size: 0.86rem; color: var(--ink-soft); line-height: 1.55;
+}
+.disclaimer-strip b { color: var(--ink); }
+
+/* ---------- Page intro ---------- */
+.page-intro { padding: 56px 0 8px; }
+.page-intro h1 { margin: 14px 0 14px; }
+.page-intro p { color: var(--ink-soft); font-size: 1.12rem; max-width: 60ch; }
+
+/* ---------- Vendor CTA band ---------- */
+/* ---------- Community band (Peptide Research Circle) ----------
+   Deep teal so it stands apart from the teal-wash vendor band
+   and the dark sections. */
+.community-band { background: linear-gradient(135deg, var(--teal-deep), var(--teal)); }
+.community-band .wrap { padding: 64px 24px; text-align: center; }
+.community-band .eyebrow { color: #F3E3E6; }
+.community-band h2 { color: #fff; font-size: 1.7rem; margin: 12px 0 14px; }
+.community-band p { color: #F8EFEC; max-width: 58ch; margin: 0 auto 26px; }
+.community-band .community-btn { background: #fff; color: var(--teal-deep); }
+.community-band .community-btn:hover { background: #F8EFEC; color: var(--teal-deep); text-decoration: none; transform: translateY(-1px); }
+
+.vendor-band { background: var(--teal-wash); border-top: 1px solid var(--teal-line); border-bottom: 1px solid var(--teal-line); }
+.vendor-band .wrap { display: flex; align-items: center; justify-content: space-between; gap: 30px; padding: 36px 24px; flex-wrap: wrap; }
+.vendor-band h3 { text-transform: uppercase; letter-spacing: 0.05em; font-size: 1.2rem; color: var(--ink); margin-bottom: 8px; }
+.vendor-band p { color: var(--ink-soft); font-size: 0.95rem; max-width: 46ch; }
+/* The vendor name inside the band text is a link too, since the button sits far right on wide screens */
+.vendor-band p a { color: var(--teal-deep); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.vendor-band p a:hover { color: var(--ink); }
+.vendor-band .code { display: inline-block; background: #fff; border: 1px dashed var(--teal); color: var(--teal-deep); font-weight: 700; padding: 3px 10px; border-radius: 7px; letter-spacing: 0.05em; }
+
+/* ---------- "Where to buy" bar ----------
+   Sits at the top of each peptide detail page so the vendor link
+   is visible without scrolling. */
+.buy-bar { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; background: var(--teal-wash); border: 1px solid var(--teal-line); border-radius: 12px; padding: 14px 18px; margin-top: 18px; }
+.buy-bar p { font-size: 0.93rem; color: var(--ink-soft); margin: 0; }
+.buy-bar .code { display: inline-block; background: #fff; border: 1px dashed var(--teal); color: var(--teal-deep); font-weight: 700; padding: 2px 9px; border-radius: 7px; letter-spacing: 0.05em; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 860px) {
+  .hero-grid { grid-template-columns: 1fr; gap: 32px; }
+  .hero-card { order: -1; }
+  .cat-grid { grid-template-columns: 1fr; }
+  .pep-grid { grid-template-columns: 1fr; }
+  .detail-grid { grid-template-columns: 1fr; }
+  .detail-side { position: static; }
+  .calc-shell { grid-template-columns: 1fr; }
+  .calc-result { position: static; }
+  .footer .wrap { grid-template-columns: 1fr; gap: 28px; }
+  .calc-field, .calc-step .hint { margin-left: 0; }
+}
+
+/* ---------- Mobile hamburger nav ---------- */
+.nav-toggle { display: none; background: none; border: 0; cursor: pointer; padding: 8px; width: 42px; height: 42px; flex-direction: column; justify-content: center; gap: 5px; }
+.nav-toggle span { display: block; height: 2px; width: 22px; background: var(--ink); border-radius: 2px; transition: transform 0.2s ease, opacity 0.2s ease; }
+.nav-toggle.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-toggle.open span:nth-child(2) { opacity: 0; }
+.nav-toggle.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+.nav-mobile { display: none; flex-direction: column; padding: 8px 24px 20px; border-top: 1px solid var(--line); background: var(--bg); }
+.nav-mobile.open { display: flex; }
+.nav-mobile a { padding: 14px 4px; font-size: 1rem; color: var(--ink-soft); border-bottom: 1px solid var(--line-soft); }
+.nav-mobile a:hover, .nav-mobile a.active { color: var(--ink); text-decoration: none; }
+.nav-mobile a.active { font-weight: 600; }
+.nav-mobile-cta { color: var(--teal-deep) !important; font-weight: 600; border-bottom: 0 !important; }
+
+@media (max-width: 860px) {
+  .nav-links { display: none; }
+  .nav-toggle { display: flex; }
+}
+
+/* ---------- Category icon (teal line) ---------- */
+.cat-dot svg { width: 22px; height: 22px; color: var(--teal-deep); }
+
+/* ---------- Before / after gallery ---------- */
+.ba-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 8px; }
+.ba-col h3 {
+  text-transform: uppercase; letter-spacing: 0.12em; font-size: 0.82rem;
+  color: var(--ink-faint); margin-bottom: 14px; text-align: center;
+}
+.ba-col.after h3 { color: var(--teal-deep); }
+.ba-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.ba-pair img {
+  width: 100%; aspect-ratio: 4/5; object-fit: cover;
+  border-radius: var(--radius-sm); border: 1px solid var(--line); box-shadow: var(--shadow);
+}
+.ba-col.after .ba-pair img { border-color: #ECE0DC; }
+.about-portrait {
+  width: 100%; max-width: 340px; border-radius: var(--radius);
+  border: 1px solid var(--line); box-shadow: var(--shadow-lg); object-fit: cover;
+}
+
+/* ---------- Hero italic accent ---------- */
+.hero h1 .accent {
+  display: block; font-style: normal; text-transform: uppercase;
+  letter-spacing: 0.04em; font-weight: 500; color: var(--teal-deep);
+  font-size: 0.62em; margin-top: 6px;
+}
+
+/* ---------- Suggested dose chips in calculator ---------- */
+.dose-presets { margin-left: 42px; margin-top: 14px; }
+.dose-presets .preset-label { font-size: 0.78rem; color: var(--ink-faint); margin-bottom: 8px; }
+.preset-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.preset-chip {
+  font-family: inherit; font-size: 0.86rem; font-weight: 600; text-align: center;
+  padding: 8px 14px; border-radius: 12px; cursor: pointer;
+  background: var(--teal-wash); color: var(--teal-deep);
+  border: 1px solid var(--teal-line); transition: all 0.15s ease; line-height: 1.2;
+}
+.preset-chip:hover { background: var(--teal); color: #fff; border-color: var(--teal); }
+.preset-chip .lvl { opacity: 0.7; font-size: 0.7rem; display: block; font-weight: 500; }
+
+/* peptide picker on calculator */
+.pep-picker { margin-bottom: 4px; }
+.pep-picker select {
+  width: 100%; font-family: inherit; font-size: 1.05rem; color: var(--ink);
+  padding: 13px 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg);
+  -webkit-appearance: none; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%238C8C86' stroke-width='1.5' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 34px;
+}
+
+@media (max-width: 860px) {
+  .ba-grid { grid-template-columns: 1fr; gap: 24px; }
+}
+
+.hero-portrait-wrap { display: flex; justify-content: flex-end; }
+@media (max-width: 860px) { .hero-portrait-wrap { justify-content: center; } }
+
+@media (max-width: 760px) {
+  .about-intro { grid-template-columns: 1fr !important; gap: 24px !important; }
+  .about-intro .about-portrait { max-width: 280px; margin: 0 auto; }
+}
+
+
+/* centered hero (no portrait) */
+.hero-centered { padding: 88px 0 64px; text-align: left; }
+
+/* ---------- About: reason rows (replaces colored boxes) ---------- */
+.reason-row { display: grid; grid-template-columns: 56px 1fr; gap: 20px; align-items: start; margin-bottom: 32px; }
+.reason-icon {
+  width: 56px; height: 56px; border-radius: 14px; display: grid; place-items: center;
+  background: var(--teal-wash); color: var(--teal-deep); border: 1px solid var(--teal-line);
+}
+.reason-icon svg { width: 26px; height: 26px; }
+.reason-row h3 {
+  text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.95rem;
+  color: var(--ink); margin-bottom: 7px; margin-top: 4px;
+}
+.reason-row p { color: var(--ink-soft); margin: 0; }
+@media (max-width: 760px) {
+  .reason-row { grid-template-columns: 48px 1fr; gap: 16px; }
+  .reason-icon { width: 48px; height: 48px; }
+}
+
+/* ---------- Units-to-mg guide ---------- */
+.units-guide { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 28px; margin-top: 16px; box-shadow: var(--shadow); }
+.units-guide h3 { font-size: 1.05rem; margin-bottom: 6px; }
+.units-sub { color: var(--ink-soft); font-size: 0.92rem; margin-bottom: 20px; max-width: 56ch; }
+.units-grid { display: grid; grid-template-columns: 90px 1fr; gap: 24px; align-items: center; }
+.units-syringe svg { width: 80px; height: 220px; }
+.units-cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
+.units-card { background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 16px; text-align: center; }
+.uc-conc { display: block; font-size: 0.86rem; color: var(--teal-deep); font-weight: 600; margin-bottom: 8px; }
+.uc-eq { display: block; font-size: 0.95rem; color: var(--ink-soft); }
+.uc-eq b { color: var(--ink); font-size: 1.05rem; }
+
+/* ---------- Supplies grid ---------- */
+.supply-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 14px; margin-top: 20px; }
+.supply-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 20px 22px; box-shadow: var(--shadow); transition: all 0.18s ease; color: var(--ink); display: block; }
+.supply-card:hover { text-decoration: none; transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--teal); }
+.supply-name { font-weight: 600; font-size: 1rem; margin-bottom: 6px; }
+.supply-desc { color: var(--ink-soft); font-size: 0.9rem; margin-bottom: 12px; }
+.supply-link { color: var(--teal-deep); font-size: 0.86rem; font-weight: 600; }
+
+@media (max-width: 760px) {
+  .units-cards { grid-template-columns: 1fr; }
+  .supply-grid { grid-template-columns: 1fr; }
+}
+
+/* ============ CALCULATOR PAGE STRUCTURE ============ */
+.calc-tabs {
+  position: sticky; top: 64px; z-index: 40;
+  background: rgba(254,252,249,0.92); backdrop-filter: saturate(180%) blur(12px);
+  border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+}
+.calc-tabs-inner { display: flex; gap: 4px; overflow-x: auto; padding: 0 24px; }
+.calc-tab {
+  flex: none; padding: 14px 16px; font-size: 0.88rem; font-weight: 600;
+  color: var(--ink-soft); border-bottom: 2px solid transparent; white-space: nowrap;
+}
+.calc-tab:hover { color: var(--ink); text-decoration: none; }
+.calc-tab.active { color: var(--teal-deep); border-bottom-color: var(--teal); }
+
+/* ---------- Dark band (var-flipping wrapper) ----------
+   Redefines the color variables inside the wrapper, so existing
+   elements (which use var(--ink-soft), var(--line), etc.) flip
+   to dark automatically. Teal accents brighten for contrast.
+   NOTE: named .dark-band, NOT .section-dark, to avoid colliding
+   with the existing .section-dark used on home and calculator. */
+.dark-band {
+  background: #2A2026;
+  color: #FBF7F4;
+  --ink: #FBF7F4;
+  --ink-soft: #D9D5CE;
+  --ink-faint: #9E9A92;
+  --line: #3A3A38;
+  --line-soft: #2C2C2A;
+  --surface: #2A2A28;
+  --teal: #C58F98;
+  --teal-deep: #B97C86;
+  --teal-wash: rgba(197,143,152,0.15);
+}
+.dark-band .reason-icon { border-color: rgba(197,143,152,0.28); }
+
+/* Dark category jump bar on the Peptides page */
+.catbar-dark {
+  background: #2A2026;
+  border-top: 1px solid #3A3A38;
+  border-bottom: 1px solid #3A3A38;
+  --ink: #FBF7F4; --ink-soft: #C9C5BE;
+}
+.catbar-dark .calc-tab:hover { color: #C58F98; }
+.catbar-dark .calc-tab.active { color: #C58F98; border-bottom-color: #C58F98; }
+
+/* Peptide search box (library page) */
+.pep-search-wrap { max-width: 260px; margin: 0 0 28px auto; position: relative; }
+.pep-search-wrap svg {
+  position: absolute; left: 15px; top: 50%; transform: translateY(-50%);
+  width: 18px; height: 18px; color: var(--ink-faint); pointer-events: none;
+}
+.pep-search {
+  width: 100%; padding: 13px 16px 13px 44px; font-size: 1rem; font-family: inherit;
+  border: 1px solid var(--line); border-radius: 12px; background: var(--surface);
+  color: var(--ink); box-shadow: var(--shadow);
+}
+.pep-search:focus { outline: 2px solid var(--teal); outline-offset: 1px; border-color: var(--teal); }
+.pep-noresults { text-align: center; color: var(--ink-soft); padding: 30px 0; display: none; }
+
+
+/* About page: quiet social links */
+.about-social { margin-top: 26px; }
+.about-social-label {
+  display: block; text-transform: uppercase; letter-spacing: 0.08em;
+  font-size: 0.72rem; font-weight: 600; color: var(--ink-faint); margin-bottom: 10px;
+}
+.about-social-links { display: flex; flex-wrap: wrap; gap: 8px 18px; }
+.about-social-links a { font-size: 0.92rem; color: var(--teal-deep); font-weight: 500; }
+.about-social-links a:hover { text-decoration: underline; }
+
+.calc-section { padding: 64px 0; position: relative; }
+.anchor { position: absolute; top: -120px; }
+.section-light { background: var(--bg); }
+.section-tint { background: var(--line-soft); }
+.section-dark { background: var(--ink); }
+
+/* syringe explainer (dark section) */
+.syringe-explain { display: grid; grid-template-columns: 120px 1fr; gap: 36px; align-items: center; margin-bottom: 36px; }
+.se-visual svg { width: 100px; height: 260px; }
+.se-facts { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.se-fact { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-sm); padding: 16px 18px; }
+.se-fact b { display: block; color: #fff; font-size: 0.98rem; margin-bottom: 4px; }
+.se-fact span { color: #CFCEC9; font-size: 0.88rem; }
+
+.units-guide-dark { background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.1); }
+.units-card-dark { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.12); }
+.units-card-dark .uc-conc { color: var(--teal); }
+
+/* water cards */
+.water-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 8px; }
+.water-card { position: relative; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 22px; box-shadow: var(--shadow); transition: all 0.18s ease; color: var(--ink); display: block; }
+.water-card:hover { text-decoration: none; transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--teal); }
+.wc-tag { position: absolute; top: 14px; right: 14px; background: var(--teal); color: #fff; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; padding: 3px 9px; border-radius: 100px; }
+.wc-name { font-weight: 600; font-size: 1rem; margin-bottom: 6px; }
+.wc-desc { color: var(--ink-soft); font-size: 0.9rem; margin-bottom: 12px; }
+
+@media (max-width: 760px) {
+  .syringe-explain { grid-template-columns: 90px 1fr; gap: 20px; }
+  .se-facts { grid-template-columns: 1fr; }
+  .water-cards { grid-template-columns: 1fr; }
+  .calc-tabs { top: 56px; }
+}
+
+/* category cards without icons */
+.cat-card-noicon { padding-top: 24px; }
+.cat-card-noicon .cat-card-name { margin-top: 0; }
+
+/* syringe types (two-up, dark section) */
+.syringe-types { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 36px; }
+.syringe-type { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-sm); padding: 22px; }
+.st-badge { display: inline-block; background: var(--teal); color: #fff; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; padding: 3px 10px; border-radius: 100px; }
+
+/* COA points (light section) */
+.coa-points { display: grid; gap: 12px; }
+.coa-point { display: grid; grid-template-columns: 34px 1fr; gap: 14px; align-items: start; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 16px 18px; }
+.coa-point b { color: var(--ink); }
+.coa-point > div { color: var(--ink-soft); font-size: 0.92rem; }
+.coa-n { width: 28px; height: 28px; border-radius: 50%; background: var(--teal-wash); color: var(--teal-deep); display: grid; place-items: center; font-weight: 700; font-size: 0.9rem; border: 1px solid var(--teal-line); }
+
+@media (max-width: 760px) {
+  .syringe-types { grid-template-columns: 1fr; }
+}
+
+/* start-here note (Peptides page) */
+.start-here { display: grid; grid-template-columns: 52px 1fr; gap: 18px; align-items: start; background: var(--teal-wash); border: 1px solid var(--teal-line); border-radius: var(--radius); padding: 24px 26px; margin-top: 16px; }
+.start-here-icon { width: 52px; height: 52px; border-radius: 13px; background: #fff; color: var(--teal-deep); display: grid; place-items: center; border: 1px solid var(--teal-line); }
+.start-here-icon svg { width: 26px; height: 26px; }
+.start-here h3 { text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.86rem; color: var(--ink); margin-bottom: 8px; }
+.start-here p { color: var(--ink-soft); margin: 0; font-size: 0.86rem; line-height: 1.55; }
+@media (max-width: 760px) { .start-here { grid-template-columns: 44px 1fr; gap: 14px; padding: 20px; } .start-here-icon { width: 44px; height: 44px; } }
+
+/* three syringe types */
+.syringe-types-3 { grid-template-columns: repeat(3, 1fr); }
+.shot-types { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 0 0 36px; }
+.shot-type { background: rgba(197,143,152,0.08); border: 1px solid rgba(197,143,152,0.25); border-radius: var(--radius-sm); padding: 18px 20px; }
+.shot-type h4 { color: var(--teal); font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
+.shot-type p { color: #CFCEC9; font-size: 0.9rem; margin: 0; }
+@media (max-width: 860px) { .syringe-types-3 { grid-template-columns: 1fr; } }
+@media (max-width: 760px) { .shot-types { grid-template-columns: 1fr; } }
+
+/* ============ MOBILE POLISH PASS ============ */
+@media (max-width: 600px) {
+  /* tighten oversized display headings on phones */
+  .page-intro h1.display, .hero h1.display { font-size: clamp(2rem, 9vw, 2.6rem); line-height: 1.08; }
+  .display { word-break: normal; overflow-wrap: break-word; }
+
+  /* prevent hint/label text overflow in calc */
+  .calc-step .hint, .calc-step-head h3 { overflow-wrap: break-word; }
+  .calc-input-row { flex-wrap: nowrap; }
+  .calc-input-row input { min-width: 0; }
+
+  /* sticky tabs: comfortable tap targets, fade edges */
+  .calc-tabs-inner { padding: 0 16px; }
+  .calc-tab { padding: 13px 13px; font-size: 0.84rem; }
+
+  /* section padding trimmed on phones */
+  .calc-section { padding: 44px 0; }
+  .section, .section-light, .section-tint, .section-dark { padding-top: 44px; padding-bottom: 44px; }
+
+  /* detail sidebar spacing when stacked */
+  .detail-side { margin-top: 28px; }
+
+  /* supply + water + units cards full width already; ensure gaps */
+  .se-facts { gap: 10px; }
+
+  /* wrap padding a touch tighter */
+  .wrap { padding-left: 20px; padding-right: 20px; }
+
+  /* buttons comfortable on phones */
+  .btn-lg { padding: 14px 22px; }
+  .hero-actions { flex-direction: column; align-items: stretch; }
+  .hero-actions .btn { width: 100%; text-align: center; }
+}
+
+/* tap target minimums everywhere */
+@media (max-width: 860px) {
+  .nav-cta { padding: 10px 16px; }
+  .pep-card, .supply-card, .water-card, .cat-card { -webkit-tap-highlight-color: transparent; }
+}
+
+/* fix calculator horizontal overflow on mobile */
+@media (max-width: 600px) {
+  .calc-step { padding: 20px 18px; }
+  .calc-step .hint { margin-left: 0; }
+  .calc-field { margin-left: 0; }
+  .calc-steps, .calc-step, .calc-shell { min-width: 0; max-width: 100%; }
+  .calc-step-head { flex-wrap: wrap; }
+  select, input { max-width: 100%; }
+}
+* { box-sizing: border-box; }
+
+/* category cards on dark background */
+.section-dark .cat-card { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.1); box-shadow: none; }
+.section-dark .cat-card:hover { background: rgba(255,255,255,0.07); border-color: var(--teal); transform: translateY(-2px); }
+.section-dark .cat-card-name { color: #fff; }
+.section-dark .cat-card-desc { color: #CFCEC9; }
+.section-dark .cat-card-count { color: var(--teal); }
+
+/* what-are-peptides box */
+.what-box { background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--teal); border-radius: var(--radius-sm); padding: 20px 24px; margin: 14px 0 0; box-shadow: var(--shadow); }
+.what-box h3 { text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.86rem; color: var(--ink); margin-bottom: 8px; }
+.what-box p { color: var(--ink-soft); font-size: 0.86rem; line-height: 1.6; margin: 0; }
+
+/* Share buttons under the calculator result */
+.result-actions { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+.result-actions .btn { flex: 1; font-size: 0.85rem; padding: 9px 14px; white-space: nowrap; }
+
+/* ---------- Age gate (21+) ----------
+   Full-screen overlay shown on first visit until the visitor confirms
+   they are 21 or older. Injected by data.js on every page. */
+.age-gate {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(32, 32, 32, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.age-gate-card {
+  background: var(--bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  max-width: 480px;
+  width: 100%;
+  padding: 44px 40px;
+  text-align: center;
+}
+.age-gate-card .display { margin: 12px 0 10px; }
+.age-gate-card p {
+  color: var(--ink-soft);
+  line-height: 1.6;
+  margin: 0 0 26px;
+}
+.age-gate-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+/* Stop the page behind the gate from scrolling */
+body.age-gate-lock { overflow: hidden; }
+@media (max-width: 480px) {
+  .age-gate-card { padding: 32px 24px; }
+}
+
+/* ---------- Sano Research fonts: Playfair Display headings, Poppins text ---------- */
+h1, h2, .display, .nav-logo-text, .footer-brand, .detail-main h2 { font-family: 'Playfair Display', Georgia, serif; }
+.display { letter-spacing: 0.04em; }
+/* Dark sections: accents switch to dusty rose so they stay readable on the dark plum-black */
+.section-dark { --teal: #C58F98; --teal-deep: #D3A4AC; --teal-line: rgba(197,143,152,0.35); --teal-wash: rgba(197,143,152,0.15); }

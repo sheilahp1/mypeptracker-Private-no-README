@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Peptides Explained Simply</title>
+<meta name="description" content="Peptides explained simply. A calm peptide library and dosage calculator, built for education.">
+<!-- Social share preview (Facebook, Messenger, iMessage, etc.) -->
+<meta property="og:title" content="Peptides Explained Simply">
+<meta property="og:description" content="Peptides explained simply.">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Peptides Explained Simply">
+<meta name="twitter:description" content="Peptides explained simply.">
+<script src="config.js"></script>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="nav"></div>
+
+<header class="hero hero-centered">
+  <div class="wrap">
+    <div style="max-width:640px">
+      <span class="eyebrow">Education, made simple</span>
+      <h1 class="display">Peptides<span class="accent">explained simply.</span></h1>
+      <p class="lede" style="max-width:46ch">A calm, clear guide to peptides. The version you wish someone had handed you before you started.</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary btn-lg" href="library.html">Learn Peptides</a>
+        <a class="btn btn-ghost btn-lg" href="calculator.html">Dosing Calculator</a>
+        <span id="heroCommunity"></span>
+        <span id="heroStore"></span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="section-tight">
+  <div class="wrap">
+    <div class="disclaimer-strip">
+      <b>A quick, honest note.</b> Everything here is for education only and is not medical advice. Please talk with your own healthcare provider before making any decision about your health.
+    </div>
+  </div>
+</section>
+
+<section class="section section-dark" style="padding-top:64px">
+  <div class="wrap">
+    <span class="eyebrow" style="color:var(--teal)">Find what you need</span>
+    <h2 class="display" style="margin:12px 0 8px;color:#fff">Browse by what it helps</h2>
+    <p style="color:#CFCEC9;margin-bottom:32px;max-width:54ch">Pick the area you are curious about. Each one opens a short, readable page, no chemistry degree required.</p>
+    <div class="cat-grid" id="catGrid"></div>
+  </div>
+</section>
+
+<div id="vendorBand"></div>
+
+<section class="section">
+  <div class="wrap" style="text-align:center">
+    <h2 class="display" style="margin:0 0 14px">The calculator</h2>
+    <p style="color:var(--ink-soft);max-width:52ch;margin:0 auto 30px">Whether it is your first time or your fiftieth, the calculator does the math for reconstitution and dosing, with suggested amounts built in. Come back to it any time.</p>
+    <a class="btn btn-primary btn-lg" href="calculator.html">Dosing Calculator</a>
+  </div>
+</section>
+
+<div id="communityBand"></div>
+
+<div id="footer"></div>
+<script src="data.js"></script>
+<script>
+  document.getElementById('nav').innerHTML = renderNav('home'); initMobileNav();
+  document.getElementById('footer').innerHTML = renderFooter();
+  document.getElementById('vendorBand').innerHTML = renderVendorBand();
+  document.getElementById('communityBand').innerHTML = renderCommunityBand();
+  document.getElementById('heroCommunity').outerHTML = COMMUNITY_URL ? `<a class="btn btn-ghost btn-lg" href="${COMMUNITY_URL}" target="_blank" rel="noopener">${COMMUNITY_BUTTON}</a>` : '';
+  document.getElementById('heroStore').outerHTML = STORE_URL ? `<a class="btn btn-ghost btn-lg" href="${STORE_URL}" target="_blank" rel="noopener">${STORE_BUTTON}</a>` : '';
+
+  const counts = {};
+  PEPTIDES.forEach(p => counts[p.cat] = (counts[p.cat]||0)+1);
+  document.getElementById('catGrid').innerHTML = Object.entries(CATEGORIES).map(([key,c]) => `
+    <a class="cat-card cat-card-noicon" href="library.html#${key}">
+      <div class="cat-card-name">${c.name}</div>
+      <div class="cat-card-desc">${c.desc}</div>
+      <div class="cat-card-count">${counts[key]||0} peptide${counts[key]===1?'':'s'}</div>
+    </a>`).join("");
+</script>
+</body>
+</html>
