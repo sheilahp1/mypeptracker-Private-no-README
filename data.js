@@ -662,6 +662,7 @@ function renderNav(active) {
   const links = [
     { href: "index.html", label: "Home", key: "home" },
     { href: "library.html", label: "Peptides", key: "library" },
+    { href: "tracker.html", label: "My Log", key: "tracker" },
     { href: "about.html", label: "About", key: "about" },
   ];
   if (STORE_URL) links.push({ href: STORE_URL, label: STORE_NAV_LABEL, key: "buy", ext: true });

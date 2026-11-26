@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Log</title>
+<meta name="description" content="A private log that keeps what you track on your own device.">
+<script src="config.js"></script>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .log-card{background:#fff;border:1px solid var(--line-soft);border-radius:14px;padding:22px;margin-bottom:20px}
+  .log-warn{border:1px solid var(--teal);background:var(--line-soft);border-radius:14px;padding:18px 20px;margin-bottom:20px}
+  .log-warn h3{margin:0 0 6px;font-size:1.05rem}
+  .log-warn p{margin:0 0 8px;color:var(--ink-soft)}
+  .log-warn p:last-child{margin-bottom:0}
+  .log-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;align-items:end}
+  .log-form label{display:flex;flex-direction:column;gap:5px;font-size:.85rem;color:var(--ink-soft);font-weight:600}
+  .log-form input,.log-form select{font:inherit;padding:10px 12px;border:1px solid var(--line-soft);border-radius:10px;background:#fff;color:var(--ink);width:100%;box-sizing:border-box}
+  .log-form .wide{grid-column:1/-1}
+  .log-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+  .log-table{width:100%;border-collapse:collapse;font-size:.92rem}
+  .log-table th{text-align:left;color:var(--ink-faint);font-weight:600;padding:8px 6px;border-bottom:2px solid var(--line-soft)}
+  .log-table td{padding:10px 6px;border-bottom:1px solid var(--line-soft);vertical-align:top}
+  .log-del{background:none;border:none;color:var(--ink-faint);cursor:pointer;font:inherit;text-decoration:underline}
+  .log-empty{color:var(--ink-faint);text-align:center;padding:20px 0}
+  .log-backup-note{font-size:.88rem;color:var(--ink-faint);margin-top:10px}
+  .log-scroll{overflow-x:auto}
+  .plan-row{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--line-soft)}
+  .plan-row:last-child{border-bottom:none}
+  .plan-name{font-weight:600}
+  .plan-sub{font-size:.85rem;color:var(--ink-faint)}
+  .plan-count{font-family:var(--font-display,inherit);font-size:1.15rem;color:var(--teal-deep);font-weight:600}
+  .plan-count.due{color:#B4505E}
+  .plan-btns{display:flex;gap:8px;align-items:center}
+  @media (max-width:600px){.log-table .hide-sm{display:none}}
+</style>
+</head>
+<body>
+<div id="nav"></div>
+
+<section class="page-intro">
+  <div class="wrap">
+    <span class="eyebrow">My Log</span>
+    <h1 class="display">Keep track of what you take</h1>
+    <p>Keep your schedule, see the countdown to your next one, and write down each entry. It all stays here the next time you visit on this device. No account and no sign-in. Nothing you type is sent to us.</p>
+  </div>
+</section>
+
+<section class="section" style="padding-top:24px">
+  <div class="wrap" style="max-width:860px">
+
+    <div class="log-warn">
+      <h3>Please read: your log lives only in this browser</h3>
+      <p>Your entries are saved on this phone or computer, in this browser only. They are erased if you clear your browsing history or site data, use a private or incognito window, or switch to a different browser or device.</p>
+      <p><b>Download a backup often</b> and keep it somewhere you will not delete it, like your email, iCloud Drive, Google Drive, or your Files app. You can restore it here any time, on any device.</p>
+    </div>
+
+    <div class="log-card">
+      <h2 class="display" style="font-size:1.2rem;margin:0 0 6px">My schedule</h2>
+      <p style="color:var(--ink-soft);margin:0 0 14px;font-size:.92rem">Enter the plan you are following and see how many days until the next one. The countdown starts from your last saved entry for that peptide.</p>
+      <div id="planList"></div>
+      <details id="planAdd" style="margin-top:12px">
+        <summary style="cursor:pointer;font-weight:600;color:var(--teal-deep)">Add to my schedule</summary>
+        <form class="log-form" id="planForm" autocomplete="off" style="margin-top:12px">
+          <label>Peptide
+            <select id="pPep" required></select>
+          </label>
+          <label id="pOtherWrap" style="display:none">Name
+            <input type="text" id="pOther" maxlength="60" placeholder="Type the name">
+          </label>
+          <label>Amount
+            <input type="number" id="pAmt" step="any" min="0" required>
+          </label>
+          <label>Unit
+            <select id="pUnit">
+              <option>mg</option><option>mcg</option><option>units</option><option>mL</option>
+            </select>
+          </label>
+          <label>Every how many days
+            <input type="number" id="pEvery" min="1" step="1" value="7" required>
+          </label>
+          <label>First date
+            <input type="date" id="pStart" required>
+          </label>
+          <label class="wide">Notes (optional)
+            <input type="text" id="pNotes" maxlength="200" placeholder="Anything you want to remember">
+          </label>
+          <div class="wide log-actions">
+            <button class="btn btn-primary" type="submit">Save to schedule</button>
+          </div>
+        </form>
+      </details>
+    </div>
+
+    <div class="log-card">
+      <h2 class="display" style="font-size:1.2rem;margin:0 0 14px">Add an entry</h2>
+      <form class="log-form" id="logForm" autocomplete="off">
+        <label>Date
+          <input type="date" id="fDate" required>
+        </label>
+        <label>Time
+          <input type="time" id="fTime">
+        </label>
+        <label>Peptide
+          <select id="fPep" required></select>
+        </label>
+        <label id="otherWrap" style="display:none">Name
+          <input type="text" id="fOther" maxlength="60" placeholder="Type the name">
+        </label>
+        <label>Amount
+          <input type="number" id="fAmt" step="any" min="0" required>
+        </label>
+        <label>Unit
+          <select id="fUnit">
+            <option>mg</option><option>mcg</option><option>units</option><option>mL</option>
+          </select>
+        </label>
+        <label>How I felt (optional)
+          <select id="fFeel">
+            <option value="">Skip</option><option>Great</option><option>Good</option><option>Okay</option><option>Not great</option><option>Poor</option>
+          </select>
+        </label>
+        <label class="wide">Notes on how I'm feeling (optional)
+          <input type="text" id="fNotes" maxlength="300" placeholder="Energy, sleep, mood, anything you want to remember">
+        </label>
+        <div class="wide log-actions">
+          <button class="btn btn-primary" type="submit">Save entry</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="log-card">
+      <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px">
+        <h2 class="display" style="font-size:1.2rem;margin:0">My entries</h2>
+        <div class="log-actions" style="margin:0">
+          <button class="btn btn-primary" type="button" id="btnBackup">Download backup</button>
+          <button class="btn" type="button" id="btnCsv">Download for Excel</button>
+          <button class="btn" type="button" id="btnRestore">Restore a backup</button>
+          <input type="file" id="fileRestore" accept=".json,application/json" style="display:none">
+        </div>
+      </div>
+      <p class="log-backup-note" id="backupNote"></p>
+      <div class="log-scroll">
+        <table class="log-table">
+          <thead><tr><th>Date</th><th class="hide-sm">Time</th><th>Peptide</th><th>Amount</th><th>Felt</th><th class="hide-sm">Notes</th><th></th></tr></thead>
+          <tbody id="logBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="disclaimer-strip">
+      <b>Educational only.</b> This log is a personal notebook. It does not give advice, check amounts, or replace guidance from a qualified professional.
+    </div>
+  </div>
+</section>
+
+<div id="footer"></div>
+<script src="data.js"></script>
+<script>
+  document.getElementById('nav').innerHTML = renderNav('tracker'); initMobileNav();
+  document.getElementById('footer').innerHTML = renderFooter();
+
+  const KEY = 'mpt_log_v1', BKEY = 'mpt_log_backup_at';
+  function load(){ try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch(e){ return []; } }
+  function save(list){ try { localStorage.setItem(KEY, JSON.stringify(list)); return true; } catch(e){ alert('Your browser would not save this entry. Private windows often block saving.'); return false; } }
+  function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+  // Peptide choices from the library, plus Other
+  const sel = document.getElementById('fPep');
+  sel.innerHTML = '<option value="">Choose one</option>' +
+    PEPTIDES.slice().sort((a,b) => a.name.localeCompare(b.name)).map(p => `<option>${esc(p.name)}</option>`).join('') +
+    '<option value="__other">Other</option>';
+  sel.addEventListener('change', () => {
+    document.getElementById('otherWrap').style.display = sel.value === '__other' ? '' : 'none';
+  });
+
+  function today(){ const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0,10); }
+  document.getElementById('fDate').value = today();
+  document.getElementById('pStart').value = today();
+
+  // ---- Schedule ----
+  const PKEY = 'mpt_plan_v1';
+  function loadPlans(){ try { return JSON.parse(localStorage.getItem(PKEY)) || []; } catch(e){ return []; } }
+  function savePlans(list){ try { localStorage.setItem(PKEY, JSON.stringify(list)); return true; } catch(e){ alert('Your browser would not save this. Private windows often block saving.'); return false; } }
+  const psel = document.getElementById('pPep');
+  psel.innerHTML = sel.innerHTML;
+  psel.addEventListener('change', () => {
+    document.getElementById('pOtherWrap').style.display = psel.value === '__other' ? '' : 'none';
+  });
+  function dayNum(iso){ const [y,m,d] = iso.split('-').map(Number); return Date.UTC(y, m-1, d) / 86400000; }
+  function isoFromNum(n){ return new Date(n * 86400000).toISOString().slice(0,10); }
+  function nextDate(plan){
+    const last = load().filter(e => e.pep === plan.pep).map(e => e.date).sort().pop();
+    if (last && dayNum(last) >= dayNum(plan.start)) return isoFromNum(dayNum(last) + Number(plan.every));
+    return plan.start;
+  }
+  function niceDate(iso){ const [y,m,d] = iso.split('-').map(Number); return new Date(y, m-1, d).toLocaleDateString(undefined, {weekday:'short', month:'short', day:'numeric'}); }
+  function renderPlans(){
+    const plans = loadPlans();
+    const box = document.getElementById('planList');
+    if (!plans.length) { box.innerHTML = '<p class="log-empty" style="padding:8px 0">Nothing on your schedule yet.</p>'; document.getElementById('planAdd').open = true; return; }
+    const t = dayNum(today());
+    box.innerHTML = plans.map(p => {
+      const nd = nextDate(p), diff = dayNum(nd) - t;
+      const count = diff > 1 ? `In ${diff} days` : diff === 1 ? 'Tomorrow' : diff === 0 ? 'Today' : `${-diff} day${diff === -1 ? '' : 's'} overdue`;
+      return `<div class="plan-row">
+        <div>
+          <div class="plan-name">${esc(p.pep)}</div>
+          <div class="plan-sub">${esc(p.amt)} ${esc(p.unit)}, every ${esc(p.every)} day${p.every == 1 ? '' : 's'}${p.notes ? ' &middot; ' + esc(p.notes) : ''}</div>
+        </div>
+        <div style="text-align:right">
+          <div class="plan-count${diff <= 0 ? ' due' : ''}">${count}</div>
+          <div class="plan-sub">${niceDate(nd)}</div>
+        </div>
+        <div class="plan-btns">
+          <button class="btn btn-primary" type="button" data-done="${esc(p.id)}">Log it</button>
+          <button class="log-del" type="button" data-pdel="${esc(p.id)}">Remove</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+  document.getElementById('planForm').addEventListener('submit', ev => {
+    ev.preventDefault();
+    const pep = psel.value === '__other' ? document.getElementById('pOther').value.trim() : psel.value;
+    if (!pep) { alert('Please choose or type a peptide name.'); return; }
+    const plans = loadPlans();
+    plans.push({
+      id: 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2,6),
+      pep: pep,
+      amt: document.getElementById('pAmt').value,
+      unit: document.getElementById('pUnit').value,
+      every: Math.max(1, parseInt(document.getElementById('pEvery').value, 10) || 1),
+      start: document.getElementById('pStart').value || today(),
+      notes: document.getElementById('pNotes').value.trim()
+    });
+    if (savePlans(plans)) {
+      document.getElementById('pAmt').value = '';
+      document.getElementById('pNotes').value = '';
+      document.getElementById('planAdd').open = false;
+      renderPlans();
+    }
+  });
+  document.getElementById('planList').addEventListener('click', ev => {
+    const done = ev.target.getAttribute && ev.target.getAttribute('data-done');
+    const del = ev.target.getAttribute && ev.target.getAttribute('data-pdel');
+    if (done) {
+      // Fill the entry form from the schedule so they can add how they felt, then save
+      const p = loadPlans().find(x => x.id === done); if (!p) return;
+      const now = new Date();
+      document.getElementById('fDate').value = today();
+      document.getElementById('fTime').value = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+      const known = Array.from(sel.options).some(o => o.value === p.pep);
+      sel.value = known ? p.pep : '__other';
+      document.getElementById('otherWrap').style.display = known ? 'none' : '';
+      document.getElementById('fOther').value = known ? '' : p.pep;
+      document.getElementById('fAmt').value = p.amt;
+      document.getElementById('fUnit').value = p.unit;
+      document.getElementById('logForm').scrollIntoView({behavior:'smooth', block:'center'});
+      document.getElementById('fFeel').focus({preventScroll:true});
+    } else if (del) {
+      if (!confirm('Remove this from your schedule? Your saved entries stay.')) return;
+      savePlans(loadPlans().filter(x => x.id !== del)); renderPlans();
+    }
+  });
+
+  function render(){
+    const list = load().sort((a,b) => (b.date + (b.time||'')).localeCompare(a.date + (a.time||'')));
+    const body = document.getElementById('logBody');
+    body.innerHTML = list.length ? list.map(e => `
+      <tr>
+        <td>${esc(e.date)}</td>
+        <td class="hide-sm">${esc(e.time)}</td>
+        <td>${esc(e.pep)}</td>
+        <td>${esc(e.amt)} ${esc(e.unit)}</td>
+        <td>${esc(e.feel)}</td>
+        <td class="hide-sm">${esc(e.notes)}</td>
+        <td><button class="log-del" data-id="${esc(e.id)}">Remove</button></td>
+      </tr>`).join('') : '<tr><td colspan="7" class="log-empty">No entries yet.</td></tr>';
+    renderPlans();
+    let at = null; try { at = localStorage.getItem(BKEY); } catch(e){}
+    document.getElementById('backupNote').textContent = (list.length || loadPlans().length)
+      ? (at ? 'Last backup downloaded ' + new Date(at).toLocaleDateString() + '.' : 'You have not downloaded a backup yet.')
+      : '';
+  }
+
+  document.getElementById('logForm').addEventListener('submit', ev => {
+    ev.preventDefault();
+    const pep = sel.value === '__other' ? document.getElementById('fOther').value.trim() : sel.value;
+    if (!pep) { alert('Please choose or type a peptide name.'); return; }
+    const list = load();
+    list.push({
+      id: Date.now().toString(36) + Math.random().toString(36).slice(2,6),
+      date: document.getElementById('fDate').value,
+      time: document.getElementById('fTime').value,
+      pep: pep,
+      amt: document.getElementById('fAmt').value,
+      unit: document.getElementById('fUnit').value,
+      feel: document.getElementById('fFeel').value,
+      notes: document.getElementById('fNotes').value.trim()
+    });
+    if (save(list)) {
+      document.getElementById('fAmt').value = '';
+      document.getElementById('fFeel').value = '';
+      document.getElementById('fNotes').value = '';
+      render();
+    }
+  });
+
+  document.getElementById('logBody').addEventListener('click', ev => {
+    const id = ev.target.getAttribute && ev.target.getAttribute('data-id');
+    if (!id) return;
+    if (!confirm('Remove this entry?')) return;
+    save(load().filter(e => e.id !== id)); render();
+  });
+
+  function download(name, text, type){
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([text], {type}));
+    a.download = name; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  }
+
+  document.getElementById('btnBackup').addEventListener('click', () => {
+    const list = load(), plans = loadPlans();
+    if (!list.length && !plans.length) { alert('There is nothing to back up yet.'); return; }
+    download('my-pep-log-' + today() + '.json', JSON.stringify({site:'mypeptracker', version:1, entries:list, plans:plans}, null, 2), 'application/json');
+    try { localStorage.setItem(BKEY, new Date().toISOString()); } catch(e){}
+    render();
+  });
+
+  document.getElementById('btnCsv').addEventListener('click', () => {
+    const list = load();
+    if (!list.length) { alert('There is nothing to download yet.'); return; }
+    const q = v => '"' + String(v == null ? '' : v).replace(/"/g,'""') + '"';
+    const rows = [['Date','Time','Peptide','Amount','Unit','How I felt','Notes']].concat(list.map(e => [e.date,e.time,e.pep,e.amt,e.unit,e.feel,e.notes]));
+    download('my-pep-log-' + today() + '.csv', rows.map(r => r.map(q).join(',')).join('\r\n'), 'text/csv');
+  });
+
+  document.getElementById('btnRestore').addEventListener('click', () => document.getElementById('fileRestore').click());
+  document.getElementById('fileRestore').addEventListener('change', ev => {
+    const file = ev.target.files[0]; if (!file) return;
+    const r = new FileReader();
+    r.onload = () => {
+      try {
+        const data = JSON.parse(r.result);
+        const incoming = Array.isArray(data) ? data : data.entries;
+        if (!Array.isArray(incoming)) throw new Error();
+        const list = load(), have = new Set(list.map(e => e.id));
+        let added = 0;
+        incoming.forEach(e => { if (e && e.id && e.date && e.pep && !have.has(e.id)) { list.push(e); have.add(e.id); added++; } });
+        const plans = loadPlans(), havePlan = new Set(plans.map(p => p.id));
+        let addedPlans = 0;
+        (Array.isArray(data.plans) ? data.plans : []).forEach(p => { if (p && p.id && p.pep && p.start && p.every && !havePlan.has(p.id)) { plans.push(p); havePlan.add(p.id); addedPlans++; } });
+        if (save(list) && savePlans(plans)) { render(); alert(added + ' entr' + (added === 1 ? 'y' : 'ies') + ' and ' + addedPlans + ' schedule item' + (addedPlans === 1 ? '' : 's') + ' restored.'); }
+      } catch(e) { alert('That file is not a My Pep Tracker backup.'); }
+      ev.target.value = '';
+    };
+    r.readAsText(file);
+  });
+
+  render();
+</script>
+</body>
+</html>
