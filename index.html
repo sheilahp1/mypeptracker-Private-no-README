@@ -71,7 +71,7 @@
   document.getElementById('vendorBand').innerHTML = renderVendorBand();
   document.getElementById('communityBand').innerHTML = renderCommunityBand();
   document.getElementById('heroCommunity').outerHTML = COMMUNITY_URL ? `<a class="btn btn-ghost btn-lg" href="${COMMUNITY_URL}" target="_blank" rel="noopener">${COMMUNITY_BUTTON}</a>` : '';
-  document.getElementById('heroStore').outerHTML = STORE_URL ? `<a class="btn btn-ghost btn-lg" href="${STORE_URL}" target="_blank" rel="noopener">${STORE_BUTTON}</a>` : '';
+  document.getElementById('heroStore').outerHTML = (STORE_URL && typeof STORE_BUTTONS_ON_CONTENT !== "undefined" && STORE_BUTTONS_ON_CONTENT) ? `<a class="btn btn-ghost btn-lg" href="${STORE_URL}" target="_blank" rel="noopener">${STORE_BUTTON}</a>` : '';
 
   const counts = {};
   PEPTIDES.forEach(p => counts[p.cat] = (counts[p.cat]||0)+1);
