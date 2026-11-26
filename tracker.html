@@ -351,7 +351,11 @@
         const plans = loadPlans(), havePlan = new Set(plans.map(p => p.id));
         let addedPlans = 0;
         (Array.isArray(data.plans) ? data.plans : []).forEach(p => { if (p && p.id && p.pep && p.start && p.every && !havePlan.has(p.id)) { plans.push(p); havePlan.add(p.id); addedPlans++; } });
-        if (save(list) && savePlans(plans)) { render(); alert(added + ' entr' + (added === 1 ? 'y' : 'ies') + ' and ' + addedPlans + ' schedule item' + (addedPlans === 1 ? '' : 's') + ' restored.'); }
+        if (save(list) && savePlans(plans)) {
+          render();
+          if (!added && !addedPlans) alert('Everything in this backup is already in your log. Nothing was missing.');
+          else alert(added + ' entr' + (added === 1 ? 'y' : 'ies') + ' and ' + addedPlans + ' schedule item' + (addedPlans === 1 ? '' : 's') + ' restored.');
+        }
       } catch(e) { alert('That file is not a My Pep Tracker backup.'); }
       ev.target.value = '';
     };
